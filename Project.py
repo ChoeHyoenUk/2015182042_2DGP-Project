@@ -86,7 +86,7 @@ class Player:
         self.dir = 0
         self.stand_dir = 1
 
-        self.speed = 1.5
+        self.speed = 0.7
         self.x, self.y = 400, 85
         self.weapons = Weapon(self.x, self.y, 7, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png")
         self.hp = 100
@@ -95,6 +95,7 @@ class Player:
         self.dash_distance = 0
         self.dash_count = 6
         self.frame = 0
+        self.opacity_mode = False
 
         self.j_pos, self.d_start, self.d_end = None, None, None
         self.isjumping, self.falling, self.attack = False, False, True
@@ -111,9 +112,11 @@ class Player:
             t = self.dash_distance / 100
             self.x = (1 - t) * self.d_start[0] + t * self.d_end[0]
             self.y = (1 - t) * self.d_start[1] + t * self.d_end[1]
-            self.dash_distance += 3
+            self.dash_distance += 1
 
             if self.dash_distance > 100:
+                self.image.opacify(1)
+                self.opacity_mode = False
                 self.dash_distance = 0
                 self.state = StateList.IDLE
                 self.d_start = None
@@ -668,8 +671,13 @@ def handle_events():
                 if not d_timer_run:
                     dash_timer_start()
 
+                if not player.opacity_mode:
+                    player.opacity_mode = True
+                    player.image.opacify(0.5)
+
             if player.dash_count == 0:
                 print("U CAN'T DASH!!")
+
 
         # 마우스 좌클릭(공격)
         elif event.type == SDL_MOUSEBUTTONDOWN and event.button == SDL_BUTTON_LEFT:
@@ -779,5 +787,6 @@ while running:
     cursor.draw(M_x, M_y)
 
     update_canvas()
+
 
 close_canvas()
