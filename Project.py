@@ -86,7 +86,7 @@ class Player:
         self.dir = 0
         self.stand_dir = 1
 
-        self.speed = 0.7
+        self.speed = 1
         self.x, self.y = 400, 85
         self.weapons = Weapon(self.x, self.y, 7, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png")
         self.hp = 100
@@ -112,7 +112,7 @@ class Player:
             t = self.dash_distance / 100
             self.x = (1 - t) * self.d_start[0] + t * self.d_end[0]
             self.y = (1 - t) * self.d_start[1] + t * self.d_end[1]
-            self.dash_distance += 1
+            self.dash_distance += 1.5
 
             if self.dash_distance > 100:
                 self.image.opacify(1)
@@ -422,7 +422,7 @@ class Boss_Sword:
         elif self.state == StateList.FALL:
             self.x = (1 - self.fall_distant) * self.start_x + self.fall_distant * self.end_x
             self.y = (1 - self.fall_distant) * self.start_y + self.fall_distant * self.end_y
-            self.fall_distant += 0.003
+            self.fall_distant += 0.01
 
     def draw(self):
         Boss_Sword.image.rotate_draw(self.angle/360*2*pi, self.x, self.y, 30, 120)
@@ -686,7 +686,7 @@ def handle_events():
                 player.attack = False
                 attack_timer_start(player.weapons.cooldown)
             else:
-                print("COOLTIME!!")
+                print("ATTACK COOLTIME!!")
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_KP_0):
             if not skul_monster.state == StateList.ATK:
@@ -784,7 +784,7 @@ while running:
         for sword in belial_sword:
             sword.draw()
 
-    cursor.draw(M_x, M_y)
+    cursor.draw(M_x, M_y, 30, 30)
 
     update_canvas()
 
