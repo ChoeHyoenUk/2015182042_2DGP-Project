@@ -1,14 +1,14 @@
-from pico2d import *
-from math import *
+import math
 import threading
 import random
 import enum
 import os
+from pico2d import *
+import game_framework
+
+name = "MainState"
 
 os.chdir('C:\\Users\\levy-\\Desktop\\1\\2DGP\\2015182042_2DGP-Project\\TEXTURE')
-
-open_canvas()
-hide_cursor()
 
 gravity = 6.2
 M_x, M_y = 0, 0
@@ -17,11 +17,18 @@ running = True
 frame = 0
 d_timer_run = False
 
-# 이미지
-cursor = load_image("Cursor.png")
-grass = load_image("grass.png")
-d_count = load_image("DashCount.png")
-d_board = load_image("DashCountBase.png")
+bg_image = None
+grass = None
+player = None
+skul_monster = None
+banshee = []
+belial = None
+banshee_bullets = []
+belial_bullets = []
+belial_sword = []
+cursor = None
+d_count = None
+d_board = None
 
 
 class StateList(enum.Enum):
@@ -38,9 +45,6 @@ class StateList(enum.Enum):
 
 class Weapon:
     def __init__(self, X, Y, ATK, COOLDOWN, W, H, SWORD_IMAGE, SWING_IMAGE):
-        self.x, self.y = 0, 80
-        self.draw_x, self.draw_y = 0, 0
-        self.move_x, self.move_y = 0, 0
         self.atk = ATK
         self.cooldown = COOLDOWN
         self.H, self.W = H, W
@@ -48,6 +52,8 @@ class Weapon:
         self.image = load_image(SWORD_IMAGE)
         self.swing_image = load_image(SWING_IMAGE)
         self.angle = 0
+        self.x = (30 * math.cos(self.angle / 360 * 2 * math.pi)) + X
+        self.y = (30 * math.sin(self.angle / 360 * 2 * math.pi)) + (Y - 20)
         self.isswing = False
 
     def swing(self):
@@ -72,9 +78,9 @@ class Weapon:
     def draw(self):
         global player
         if player.stand_dir == 1:
-            self.image.rotate_draw(self.angle / 360 * 2 * pi, self.x, self.y, 25, 50)
+            self.image.rotate_draw(self.angle / 360 * 2 * math.pi, self.x, self.y, 25, 50)
         else:
-            self.image.composite_draw(self.angle / 360 * 2 * pi, 'v', self.x, self.y, 25, 50)
+            self.image.composite_draw(self.angle / 360 * 2 * math.pi, 'v', self.x, self.y, 25, 50)
 
 
 class Player:
@@ -145,40 +151,40 @@ class Player:
                 self.y = ground
                 self.j_time = 0
 
-        player.weapons.x = ((20 * cos(player.weapons.angle / 360 * 2 * pi)) + player.x)
-        player.weapons.y = (20 * sin(player.weapons.angle / 360 * 2 * pi)) + (player.y - 20)
+        player.weapons.x = (30 * math.cos(player.weapons.angle / 360 * 2 * math.pi)) + player.x
+        player.weapons.y = (30 * math.sin(player.weapons.angle / 360 * 2 * math.pi)) + (player.y - 20)
         self.frame = (self.frame + 1) % 4
 
     def draw(self):
         if self.state == StateList.IDLE:
             if self.stand_dir == 1:
                 if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 160, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(0, 160, 32, 32, self.x, self.y, 60, 60)
                 else:
-                    self.image.clip_draw(self.frame * 32, 32, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(self.frame * 32, 32, 32, 32, self.x, self.y, 60, 60)
             else:
                 if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 128, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(0, 128, 32, 32, self.x, self.y, 60, 60)
                 else:
-                    self.image.clip_draw(self.frame * 32, 0, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(self.frame * 32, 0, 32, 32, self.x, self.y, 60, 60)
 
         elif self.state == StateList.RUN:
             if self.stand_dir == 1:
                 if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 160, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(0, 160, 32, 32, self.x, self.y, 60, 60)
                 else:
-                    self.image.clip_draw(self.frame * 32, 96, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(self.frame * 32, 96, 32, 32, self.x, self.y, 60, 60)
             else:
                 if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 128, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(0, 128, 32, 32, self.x, self.y, 60, 60)
                 else:
-                    self.image.clip_draw(self.frame * 32, 64, 32, 32, self.x, self.y, 80, 80)
+                    self.image.clip_draw(self.frame * 32, 64, 32, 32, self.x, self.y, 60, 60)
 
         elif self.state == StateList.DASH:
             if player.stand_dir == -1:
-                self.image.clip_draw(self.frame * 32, 64, 32, 32, player.x, player.y, 80, 80)
+                self.image.clip_draw(self.frame * 32, 64, 32, 32, player.x, player.y, 60, 60)
             elif player.stand_dir == 1:
-                self.image.clip_draw(self.frame * 32, 96, 32, 32, player.x, player.y, 80, 80)
+                self.image.clip_draw(self.frame * 32, 96, 32, 32, player.x, player.y, 60, 60)
 
         elif self.state == StateList.DEAD:
             self.image.clip_draw(0, 192, 32, 32, self.x, self.y, 80, 80)
@@ -206,15 +212,6 @@ class Skeleton:
         if Skeleton.Atk_image is None:
             Skeleton.Atk_image = load_image("SkelAtk(71x48).png")
 
-    '''
-    def state_change(self):
-        temp = random.randint(-1, 1)
-        if temp == -1 or temp == 1:
-            self.dir = temp
-            self.state = StateList.RUN
-        else:
-            self.state == StateList.IDLE
-    '''
 
     def update(self):
         if self.state == StateList.ATK:
@@ -308,8 +305,8 @@ class Banshee_Bullet:
         self.frame = 0
 
     def update(self):
-        self.x = (self.r * cos(self.angle / 360 * 2 * pi)) + self.cen_x
-        self.y = (self.r * sin(self.angle / 360 * 2 * pi)) + self.cen_y
+        self.x = (self.r * math.cos(self.angle / 360 * 2 * math.pi)) + self.cen_x
+        self.y = (self.r * math.sin(self.angle / 360 * 2 * math.pi)) + self.cen_y
         self.r += 3
         self.frame = (self.frame + 1) % 4
 
@@ -390,8 +387,8 @@ class Boss_Bullet:
         self.r = 0
 
     def update(self):
-        self.x = Boss_Bullet.cen_x + (self.r * cos(self.angle / 360 * 2 * pi))
-        self.y = Boss_Bullet.cen_y + (self.r * sin(self.angle / 360 * 2 * pi))
+        self.x = Boss_Bullet.cen_x + (self.r * math.cos(self.angle / 360 * 2 * math.pi))
+        self.y = Boss_Bullet.cen_y + (self.r * math.sin(self.angle / 360 * 2 * math.pi))
         self.r += 1
 
     def draw(self):
@@ -411,7 +408,7 @@ class Boss_Sword:
         self.angle = 0
         self.state = StateList.IDLE
         self.start_x, self.start_y = self.x, self.y
-        self. end_x, self.end_y = player.x, player.y - 40
+        self.end_x, self.end_y = player.x, player.y - 40
         self.fall_distant = 0
 
     def update(self):
@@ -425,7 +422,7 @@ class Boss_Sword:
             self.fall_distant += 0.01
 
     def draw(self):
-        Boss_Sword.image.rotate_draw(self.angle/360*2*pi, self.x, self.y, 30, 120)
+        Boss_Sword.image.rotate_draw(self.angle / 360 * 2 * math.pi, self.x, self.y, 30, 120)
 
 
 class Belial:
@@ -475,7 +472,7 @@ def get_angle(start_x, start_y, end_x, end_y):
 
 
 def get_distant(x1, y1, x2, y2):
-    return sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))
+    return math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2))
 
 
 def dash_timer_start():
@@ -490,6 +487,7 @@ def dash_timer_start():
             player.dash_count += 1
         timer.start()
     else:
+        timer.cancel()
         d_timer_run = False
 
 
@@ -501,11 +499,6 @@ def attack_timer():
 def attack_timer_start(cooldown):
     timer = threading.Timer(cooldown, attack_timer)
     timer.start()
-
-
-def monster_state_chagne_timer():
-    global skul_monster
-    skul_monster.state_change()
 
 
 def LEFT_Laser_Shot():
@@ -543,6 +536,50 @@ def Drop_Sword():
             belial_sword[0].state = StateList.FALL
 
 
+def enter():
+    global player
+    global grass
+    global skul_monster
+    global banshee
+    global belial
+    global cursor
+    global d_count, d_board
+    global bg_image
+
+    player = Player()
+    grass = load_image("grass.png")
+    skul_monster = Skeleton()
+    for i in range(5):
+        banshee.append(Banshee())
+    belial = Belial()
+    cursor = load_image("Cursor.png")
+    d_count = load_image("DashCount.png")
+    d_board = load_image("DashCountBase.png")
+    bg_image = load_image("SubBG-sharedassets7.assets-57.png")
+
+
+def exit():
+    global player
+    global grass
+    global skul_monster
+    global banshee
+    global belial
+
+    del player
+    del grass
+    del skul_monster
+    del banshee
+    del belial
+
+
+def pause():
+    pass
+
+
+def resume():
+    pass
+
+
 def handle_events():
     global player
     global running
@@ -557,10 +594,10 @@ def handle_events():
 
     for event in events:
         if event.type == SDL_QUIT:
-            running = False
+            game_framework.quit()
 
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            running = False
+            game_framework.quit()
 
         # 오른쪽 이동
         elif event.type == SDL_KEYDOWN and event.key == SDLK_d:
@@ -709,21 +746,18 @@ def handle_events():
             if len(belial_sword) == 0:
                 for i in range(5):
                     belial_sword.append(Boss_Sword(50 * i))
-                timer = threading.Timer(5,Drop_Sword)
+                timer = threading.Timer(5, Drop_Sword)
                 timer.start()
 
 
-player = Player()
-skul_monster = Skeleton()
-banshee = [Banshee() for i in range(5)]
-belial = Belial()
-banshee_bullets = []
-belial_bullets = []
-belial_sword = []
-
-while running:
-    clear_canvas()
-    handle_events()
+def update():
+    global player
+    global skul_monster
+    global banshee
+    global belial
+    global banshee_bullets
+    global belial_bullets
+    global belial_sword
 
     player.update()
 
@@ -756,6 +790,20 @@ while running:
             else:
                 sword.update()
 
+
+def draw():
+    global player
+    global skul_monster
+    global banshee
+    global belial
+    global banshee_bullets
+    global belial_bullets
+    global belial_sword
+    global cursor
+    global d_count, d_count
+
+    clear_canvas()
+    bg_image.draw(400, 300, 800, 600)
     grass.draw(400, 30)
 
     d_board.draw(48, 593, 96, 14)
@@ -785,8 +833,5 @@ while running:
             sword.draw()
 
     cursor.draw(M_x, M_y, 30, 30)
-
     update_canvas()
-
-
-close_canvas()
+    pass
