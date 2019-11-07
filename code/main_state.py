@@ -5,6 +5,7 @@ import enum
 import os
 from pico2d import *
 import game_framework
+from PlayerClass import Player
 
 name = "MainState"
 
@@ -43,157 +44,6 @@ class StateList(enum.Enum):
     PATTERN3 = enum.auto()
 
 
-class Weapon:
-    def __init__(self, X, Y, ATK, COOLDOWN, W, H, SWORD_IMAGE, SWING_IMAGE):
-        self.atk = ATK
-        self.cooldown = COOLDOWN
-        self.H, self.W = H, W
-        self.frame = 0
-        self.image = load_image(SWORD_IMAGE)
-        self.swing_image = load_image(SWING_IMAGE)
-        self.angle = 0
-        self.x = (30 * math.cos(self.angle / 360 * 2 * math.pi)) + X
-        self.y = (30 * math.sin(self.angle / 360 * 2 * math.pi)) + (Y - 20)
-        self.isswing = False
-
-    def swing(self):
-        if -90 <= self.angle <= 90:
-            self.swing_image.clip_composite_draw(self.W * self.frame, 0, self.W, self.H, self.angle / 360 * 2 * math.pi,
-                                                 'v',
-                                                 self.x + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
-                                                 self.y + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
-                                                 self.W + 60, self.H + 35)
-        else:
-            self.swing_image.clip_composite_draw(self.W * self.frame, 0, self.W, self.H, self.angle / 360 * 2 * math.pi,
-                                                 'v',
-                                                 self.x + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
-                                                 self.y + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
-                                                 self.W + 60, self.H + 35)
-        self.frame = (self.frame + 1) % 4
-
-        if self.frame == 0:
-            self.isswing = False
-        delay(0.02)
-
-    def draw(self):
-        global player
-        if player.stand_dir == 1:
-            self.image.rotate_draw(self.angle / 360 * 2 * math.pi, self.x, self.y, 25, 50)
-        else:
-            self.image.composite_draw(self.angle / 360 * 2 * math.pi, 'v', self.x, self.y, 25, 50)
-
-
-class Player:
-
-    def __init__(self):
-        self.image = load_image("Character_Sheet(32x32).png")
-
-        self.state = StateList.IDLE
-        self.dir = 0
-        self.stand_dir = 1
-
-        self.speed = 1
-        self.x, self.y = 400, 85
-        self.weapons = Weapon(self.x, self.y, 7, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png")
-        self.hp = 100
-        self.atk = 7
-        self.j_power, self.j_time = 6.5, 0
-        self.dash_distance = 0
-        self.dash_count = 6
-        self.frame = 0
-        self.opacity_mode = False
-
-        self.j_pos, self.d_start, self.d_end = None, None, None
-        self.isjumping, self.falling, self.attack = False, False, True
-
-    def update(self):
-        global gravity
-        global ground
-
-        if self.state == StateList.RUN:
-            self.x += self.speed * self.dir
-            self.x = clamp(20, self.x, 800 - 20)
-
-        elif self.state == StateList.DASH:
-            t = self.dash_distance / 100
-            self.x = (1 - t) * self.d_start[0] + t * self.d_end[0]
-            self.y = (1 - t) * self.d_start[1] + t * self.d_end[1]
-            self.dash_distance += 1.5
-
-            if self.dash_distance > 100:
-                self.image.opacify(1)
-                self.opacity_mode = False
-                self.dash_distance = 0
-                self.state = StateList.IDLE
-                self.d_start = None
-                self.d_end = None
-                if self.y > ground:
-                    self.falling = True
-                    self.j_time = 0
-
-        if self.isjumping:
-            self.y = round(self.y + ((-gravity / 2) * self.j_time ** 2 + self.j_power * self.j_time))
-            self.j_time += 0.02
-
-            if self.y < self.j_pos:
-                self.isjumping = False
-                self.state = StateList.IDLE
-                self.y = self.j_pos
-                self.j_time = 0
-
-        if self.falling:
-            self.y = round(self.y + ((-gravity * self.j_time ** 2) / 2))
-            self.j_time += 0.02
-
-            if self.y < ground:
-                self.falling = False
-                self.state = StateList.IDLE
-                self.y = ground
-                self.j_time = 0
-
-        player.weapons.x = (30 * math.cos(player.weapons.angle / 360 * 2 * math.pi)) + player.x
-        player.weapons.y = (30 * math.sin(player.weapons.angle / 360 * 2 * math.pi)) + (player.y - 20)
-        self.frame = (self.frame + 1) % 4
-
-    def draw(self):
-        if self.state == StateList.IDLE:
-            if self.stand_dir == 1:
-                if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 160, 32, 32, self.x, self.y, 60, 60)
-                else:
-                    self.image.clip_draw(self.frame * 32, 32, 32, 32, self.x, self.y, 60, 60)
-            else:
-                if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 128, 32, 32, self.x, self.y, 60, 60)
-                else:
-                    self.image.clip_draw(self.frame * 32, 0, 32, 32, self.x, self.y, 60, 60)
-
-        elif self.state == StateList.RUN:
-            if self.stand_dir == 1:
-                if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 160, 32, 32, self.x, self.y, 60, 60)
-                else:
-                    self.image.clip_draw(self.frame * 32, 96, 32, 32, self.x, self.y, 60, 60)
-            else:
-                if self.falling or self.isjumping:
-                    self.image.clip_draw(0, 128, 32, 32, self.x, self.y, 60, 60)
-                else:
-                    self.image.clip_draw(self.frame * 32, 64, 32, 32, self.x, self.y, 60, 60)
-
-        elif self.state == StateList.DASH:
-            if player.stand_dir == -1:
-                self.image.clip_draw(self.frame * 32, 64, 32, 32, player.x, player.y, 60, 60)
-            elif player.stand_dir == 1:
-                self.image.clip_draw(self.frame * 32, 96, 32, 32, player.x, player.y, 60, 60)
-
-        elif self.state == StateList.DEAD:
-            self.image.clip_draw(0, 192, 32, 32, self.x, self.y, 80, 80)
-
-        if self.weapons.isswing:
-            self.weapons.swing()
-        self.weapons.draw()
-
-
 class Skeleton:
     image = None
     Atk_image = None
@@ -211,7 +61,6 @@ class Skeleton:
             Skeleton.image = load_image("Skel(33x30).png")
         if Skeleton.Atk_image is None:
             Skeleton.Atk_image = load_image("SkelAtk(71x48).png")
-
 
     def update(self):
         if self.state == StateList.ATK:
@@ -487,8 +336,8 @@ def dash_timer_start():
             player.dash_count += 1
         timer.start()
     else:
-        timer.cancel()
         d_timer_run = False
+        timer.cancel()
 
 
 def attack_timer():
@@ -580,6 +429,7 @@ def resume():
     pass
 
 
+'''
 def handle_events():
     global player
     global running
@@ -599,11 +449,12 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
 
+
         # 오른쪽 이동
         elif event.type == SDL_KEYDOWN and event.key == SDLK_d:
             if not player.state == StateList.DASH:
                 player.state = StateList.RUN
-                player.dir = 1
+                player.move_dir = 1
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_RIGHT):
             if not skul_monster.state == StateList.ATK:
@@ -614,7 +465,7 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_a:
             if not player.state == StateList.DASH:
                 player.state = StateList.RUN
-                player.dir = -1
+                player.move_dir = -1
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_LEFT):
             if not skul_monster.state == StateList.ATK:
@@ -623,15 +474,15 @@ def handle_events():
 
         # 점프
         elif event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
-            if not player.state == StateList.DASH and not player.isjumping and not player.falling:
-                player.isjumping = True
+            if not player.state == StateList.DASH and not player.jumping and not player.falling:
+                player.jumping = True
                 player.j_pos = player.y
 
         # 오른쪽 이동 중 정지
         elif event.type == SDL_KEYUP and event.key == SDLK_a:
             if not player.state == StateList.DASH:
                 player.state = StateList.IDLE
-                player.dir = 0
+                player.move_dir = 0
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_RIGHT):
             skul_monster.state = StateList.IDLE
@@ -640,7 +491,7 @@ def handle_events():
         elif event.type == SDL_KEYUP and event.key == SDLK_d:
             if not player.state == StateList.DASH:
                 player.state = StateList.IDLE
-                player.dir = 0
+                player.move_dir = 0
 
         elif (event.type, event.key) == (SDL_KEYUP, SDLK_LEFT):
             skul_monster.state = StateList.IDLE
@@ -656,7 +507,7 @@ def handle_events():
             if not player.state == StateList.DASH:
                 player.hp = 100
                 player.state = StateList.IDLE
-                player.dir = 0
+                player.move_dir = 0
 
         # 원위치
         elif event.type == SDL_KEYUP and event.key == SDLK_t:
@@ -664,7 +515,7 @@ def handle_events():
                 player.x, player.y = 400, 85
                 player.weapons.x, player.weapons.y = 420, 90
                 player.state = StateList.IDLE
-                player.dir = 0
+                player.move_dir = 0
 
         # 마우스 이동
         elif event.type == SDL_MOUSEMOTION:
@@ -699,7 +550,7 @@ def handle_events():
                     end_y = 600 - 1 - event.y
 
                 player.dash_distance = 0
-                player.isjumping, player.falling = False, False
+                player.jumping, player.falling = False, False
                 player.state = StateList.DASH
                 player.d_start = (player.x, player.y)
                 player.d_end = (end_x, end_y)
@@ -748,6 +599,38 @@ def handle_events():
                     belial_sword.append(Boss_Sword(50 * i))
                 timer = threading.Timer(5, Drop_Sword)
                 timer.start()
+'''
+
+
+def handle_events():
+    global player
+    global running
+    global M_x, M_y
+    global d_timer_run
+    global skul_monster
+    global banshee
+    global banshee_bullets
+    global belial
+    global belial_sword
+    events = get_events()
+
+    for event in events:
+        if event.type == SDL_QUIT:
+            game_framework.quit()
+
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
+            game_framework.quit()
+
+        elif event.type == SDL_MOUSEMOTION:
+            M_x, M_y = event.x, 600 - 1 - event.y
+            player.weapon.angle = get_angle(player.x, player.y, M_x, M_y)
+            if player.x < M_x:
+                player.stand_dir = 1
+            elif player.x > M_x:
+                player.stand_dir = -1
+
+        else:
+            player.handle_event(event)
 
 
 def update():
