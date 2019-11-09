@@ -1,20 +1,17 @@
 import threading
-import random
 import enum
 from pico2d import *
 import game_framework
 from PlayerClass import Player
 from BansheeClass import Banshee
+from SkeletonClass import Skeleton
 
 name = "MainState"
 
 os.chdir('C:\\Users\\levy-\\Desktop\\1\\2DGP\\2015182042_2DGP-Project\\TEXTURE')
 
-gravity = 6.2
 M_x, M_y = 0, 0
-ground = 85
 running = True
-frame = 0
 d_timer_run = False
 
 bg_image = None
@@ -33,65 +30,10 @@ d_board = None
 
 class StateList(enum.Enum):
     IDLE = enum.auto()
-    RUN = enum.auto()
-    DASH = enum.auto()
-    DEAD = enum.auto()
-    ATK = enum.auto()
-    FALL = enum.auto
     PATTERN1 = enum.auto()
     PATTERN2 = enum.auto()
     PATTERN3 = enum.auto()
 
-
-class Skeleton:
-    image = None
-    Atk_image = None
-
-    def __init__(self):
-        self.hp = 60
-        self.atk = 7
-        self.dir = -1
-        self.x, self.y = 600, 90
-        self.speed = 1
-        self.frame = 0
-        self.atk_frame = 0
-        self.state = StateList.IDLE
-        if Skeleton.image is None:
-            Skeleton.image = load_image("Skel(33x30).png")
-        if Skeleton.Atk_image is None:
-            Skeleton.Atk_image = load_image("SkelAtk(71x48).png")
-
-    def update(self):
-        if self.state == StateList.ATK:
-            self.atk_frame = (self.atk_frame + 1) % 12
-            if self.atk_frame == 0:
-                self.state = StateList.IDLE
-
-        else:
-            if self.state == StateList.RUN:
-                self.x += self.speed * self.dir
-                self.x = clamp(20, self.x, 800 - 20)
-            self.frame = (self.frame + 1) % 6
-
-    def draw(self):
-        if self.state == StateList.IDLE:
-            if self.dir == -1:
-                Skeleton.image.clip_draw(self.frame * 33, 0, 33, 30, self.x, self.y, 33, 90)
-            elif self.dir == 1:
-                Skeleton.image.clip_draw(self.frame * 33, 30, 33, 30, self.x, self.y, 33, 90)
-
-        elif self.state == StateList.RUN:
-            if self.dir == -1:
-                Skeleton.image.clip_draw(self.frame * 33, 60, 33, 30, self.x, self.y, 33, 90)
-            elif self.dir == 1:
-                Skeleton.image.clip_draw(self.frame * 33, 90, 33, 30, self.x, self.y, 33, 90)
-
-        elif self.state == StateList.ATK:
-            if self.dir == -1:
-                Skeleton.Atk_image.clip_draw(self.atk_frame * 71, 0, 71, 48, self.x - 18, self.y + 30, 71, 144)
-            elif self.dir == 1:
-                Skeleton.Atk_image.clip_draw(self.atk_frame * 71, 48, 71, 48, self.x + 18, self.y + 30, 70, 144)
-            delay(0.02)
 
 class Belial_LEFT_Hand:
     def __init__(self, hand_image, atk_image, x, y):
@@ -357,6 +299,7 @@ def pause():
 
 def resume():
     pass
+
 
 def handle_events():
     global player
