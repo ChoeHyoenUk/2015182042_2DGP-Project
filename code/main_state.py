@@ -4,6 +4,7 @@ import enum
 from pico2d import *
 import game_framework
 from PlayerClass import Player
+from BansheeClass import Banshee
 
 name = "MainState"
 
@@ -91,75 +92,6 @@ class Skeleton:
             elif self.dir == 1:
                 Skeleton.Atk_image.clip_draw(self.atk_frame * 71, 48, 71, 48, self.x + 18, self.y + 30, 70, 144)
             delay(0.02)
-
-
-class Banshee:
-    image = None
-
-    def __init__(self):
-        if Banshee.image is None:
-            Banshee.image = load_image("Banshee(20x22).png")
-        self.hp = 40
-        self.x, self.y = random.randint(20, 780), random.randint(400, 500)
-        self.dir = 1
-        self.state = StateList.IDLE
-        self.atk = 5
-        self.frame = random.randint(0, 5)
-        self.atk_frame = 0
-
-    def update(self):
-        global player
-
-        if self.state == StateList.ATK:
-            self.atk_frame = (self.atk_frame + 1) % 6
-            if self.atk_frame == 0:
-                self.state = StateList.IDLE
-
-        else:
-            if self.x <= player.x:
-                self.dir = 1
-            else:
-                self.dir = -1
-        self.frame = (self.frame + 1) % 6
-
-    def draw(self):
-        if self.state == StateList.IDLE:
-            if self.dir == 1:
-                Banshee.image.clip_draw(self.frame * 20, 0, 20, 22, self.x, self.y, 30, 30)
-            elif self.dir == -1:
-                Banshee.image.clip_composite_draw(self.frame * 20, 0, 20, 22, 0, 'h', self.x, self.y, 30, 30)
-        else:
-            if self.dir == 1:
-                Banshee.image.clip_draw(self.frame * 20, 22, 20, 22, self.x, self.y, 30, 30)
-            elif self.dir == -1:
-                Banshee.image.clip_composite_draw(self.frame * 20, 22, 20, 22, 0, 'h', self.x, self.y, 30, 30)
-
-
-class Banshee_Bullet:
-    image = None
-    d_image = None
-
-    def __init__(self, x, y, angle):
-        if Banshee_Bullet.image is None:
-            Banshee_Bullet.image = load_image("BanShee_Bullet(13x16).png")
-        if Banshee_Bullet.d_image is None:
-            Banshee_Bullet.d_image = load_image("Banshee_Bullet_Del(20x27).png")
-        self.atk = 5
-        self.r = 0
-        self.cen_x, self.cen_y = x, y
-        self.x, self.y = 0, 0
-        self.angle = angle
-        self.frame = 0
-
-    def update(self):
-        self.x = (self.r * math.cos(self.angle / 360 * 2 * math.pi)) + self.cen_x
-        self.y = (self.r * math.sin(self.angle / 360 * 2 * math.pi)) + self.cen_y
-        self.r += 3
-        self.frame = (self.frame + 1) % 4
-
-    def draw(self):
-        Banshee_Bullet.image.clip_draw(self.frame * 13, 0, 13, 16, self.x, self.y, 20, 20)
-
 
 class Belial_LEFT_Hand:
     def __init__(self, hand_image, atk_image, x, y):
