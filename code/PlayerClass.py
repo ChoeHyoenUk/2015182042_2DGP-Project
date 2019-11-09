@@ -304,7 +304,6 @@ class LeftFallState:
 class RightFallState:
     @staticmethod
     def enter(player, event):
-        player.jump_time = 0
         player.move_dir = 1
         if event == LBUTTON_DOWN:
             player.weapon.isswing = True
@@ -340,7 +339,6 @@ class RightFallState:
 class LeftFallState:
     @staticmethod
     def enter(player, event):
-        player.jump_time = 0
         player.move_dir = -1
         if event == LBUTTON_DOWN:
             player.weapon.isswing = True
