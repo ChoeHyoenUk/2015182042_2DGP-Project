@@ -123,7 +123,7 @@ class JumpState:
             player.jumping = False
             player.y = 85
             player.j_pos = None
-            player.jump_time = 0
+        player.jump_time = 0
 
     @staticmethod
     def do(player):
@@ -164,7 +164,7 @@ class LeftJumpState:
             player.jumping = False
             player.y = 85
             player.j_pos = None
-            player.jump_time = 0
+        player.jump_time = 0
 
     @staticmethod
     def do(player):
@@ -206,7 +206,7 @@ class RightJumpState:
             player.jumping = False
             player.y = 85
             player.j_pos = None
-            player.jump_time = 0
+        player.jump_time = 0
 
     @staticmethod
     def do(player):
@@ -234,7 +234,6 @@ class RightJumpState:
 class FallState:
     @staticmethod
     def enter(player, event):
-        player.jump_time = 0
         if event == LBUTTON_DOWN:
             player.weapon.isswing = True
 
