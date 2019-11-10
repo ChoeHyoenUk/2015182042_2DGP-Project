@@ -123,7 +123,7 @@ class JumpState:
             player.jumping = False
             player.y = 85
             player.j_pos = None
-        player.jump_time = 0
+            player.jump_time = 0
 
     @staticmethod
     def do(player):
@@ -164,7 +164,7 @@ class LeftJumpState:
             player.jumping = False
             player.y = 85
             player.j_pos = None
-        player.jump_time = 0
+            player.jump_time = 0
 
     @staticmethod
     def do(player):
@@ -206,7 +206,7 @@ class RightJumpState:
             player.jumping = False
             player.y = 85
             player.j_pos = None
-        player.jump_time = 0
+            player.jump_time = 0
 
     @staticmethod
     def do(player):
@@ -435,7 +435,7 @@ next_state_table = {
 
     RightJumpState: {D_DOWN: RightJumpState, D_UP: JumpState,
                      A_DOWN: LeftJumpState, A_UP: RightJumpState,
-                     SPACE_DOWN: LeftJumpState, RBUTTON_DOWN: DashState,
+                     SPACE_DOWN: RightJumpState, RBUTTON_DOWN: DashState,
                      LBUTTON_DOWN: RightJumpState, COLLIDE: RightMoveState},
 
     DashState: {D_DOWN: DashState, D_UP: DashState,

@@ -5,10 +5,9 @@ import game_framework
 from PlayerClass import Player
 from BansheeClass import Banshee
 from SkeletonClass import Skeleton
+from BelialClass import Belial
 
 name = "MainState"
-
-os.chdir('C:\\Users\\levy-\\Desktop\\1\\2DGP\\2015182042_2DGP-Project\\TEXTURE')
 
 M_x, M_y = 0, 0
 running = True
@@ -33,157 +32,6 @@ class StateList(enum.Enum):
     PATTERN1 = enum.auto()
     PATTERN2 = enum.auto()
     PATTERN3 = enum.auto()
-
-
-class Belial_LEFT_Hand:
-    def __init__(self, hand_image, atk_image, x, y):
-        self.image = load_image(hand_image)
-        self.atk_image = load_image(atk_image)
-        self.laser = load_image("Boss_Laser(320x55).png")
-        self.x, self.y = x, y
-        self.state = StateList.IDLE
-        self.frame = 0
-
-    def update(self):
-        if self.state == StateList.PATTERN2:
-            if self.frame >= 9:
-                self.frame = 0
-                self.state = StateList.IDLE
-                Berial_Pattern2(1)
-            else:
-                self.frame += 1
-
-    def draw(self):
-        if self.state == StateList.IDLE:
-            self.image.draw(self.x, self.y)
-        elif self.state == StateList.PATTERN2:
-            self.atk_image.clip_draw(self.frame * 70, 0, 70, 80, self.x, self.y)
-            if self.frame >= 2:
-                self.laser.clip_draw(0, self.frame * 55, 320, 55, self.x + 195, self.y)
-            delay(0.02)
-
-
-class Belial_RIGHT_Hand:
-    def __init__(self, hand_image, atk_image, x, y):
-        self.image = load_image(hand_image)
-        self.atk_image = load_image(atk_image)
-        self.laser = load_image("Boss_Laser(320x55).png")
-        self.x, self.y = x, y
-        self.state = StateList.IDLE
-        self.frame = 0
-
-    def update(self):
-        if self.state == StateList.PATTERN2:
-            if self.frame >= 9:
-                self.frame = 0
-                self.state = StateList.IDLE
-            else:
-                self.frame += 1
-
-    def draw(self):
-        if self.state == StateList.IDLE:
-            self.image.draw(self.x, self.y)
-        elif self.state == StateList.PATTERN2:
-            self.atk_image.clip_draw(self.frame * 70, 0, 70, 80, self.x, self.y)
-            if self.frame >= 2:
-                self.laser.clip_composite_draw(0, self.frame * 55, 320, 55, 0, 'h', self.x - 195, self.y, 320, 55)
-            delay(0.02)
-
-
-class Boss_Bullet:
-    Atk = 7
-    cen_x, cen_y = None, None
-    image = None
-    d_image = None
-
-    def __init__(self, x, y, angle):
-        if (Boss_Bullet.cen_x, Boss_Bullet.cen_y) == (None, None):
-            Boss_Bullet.cen_x, Boss_Bullet.cen_y = x, y
-        if Boss_Bullet.image is None:
-            Boss_Bullet.image = load_image("BossBullet.png")
-        if Boss_Bullet.d_image is None:
-            Boss_Bullet.d_image = load_image("BossBullet_Del.png")
-        self.x, self.y = 0, 0
-        self.angle = angle
-        self.r = 0
-
-    def update(self):
-        self.x = Boss_Bullet.cen_x + (self.r * math.cos(self.angle / 360 * 2 * math.pi))
-        self.y = Boss_Bullet.cen_y + (self.r * math.sin(self.angle / 360 * 2 * math.pi))
-        self.r += 1
-
-    def draw(self):
-        Boss_Bullet.image.draw(self.x, self.y, 25, 25)
-
-
-class Boss_Sword:
-    Atk = 15
-    image = None
-
-    def __init__(self, x):
-        global player
-
-        if Boss_Sword.image is None:
-            Boss_Sword.image = load_image("BossSword.png")
-        self.x, self.y = 300 + x, 500
-        self.angle = 0
-        self.state = StateList.IDLE
-        self.start_x, self.start_y = self.x, self.y
-        self.end_x, self.end_y = player.x, player.y - 40
-        self.fall_distant = 0
-
-    def update(self):
-        global player
-        if self.state == StateList.IDLE:
-            self.angle = get_angle(self.x, self.y, player.x, player.y) + 90
-            self.end_x, self.end_y = player.x, player.y - 40
-        elif self.state == StateList.FALL:
-            self.x = (1 - self.fall_distant) * self.start_x + self.fall_distant * self.end_x
-            self.y = (1 - self.fall_distant) * self.start_y + self.fall_distant * self.end_y
-            self.fall_distant += 0.01
-
-    def draw(self):
-        Boss_Sword.image.rotate_draw(self.angle / 360 * 2 * math.pi, self.x, self.y, 30, 120)
-
-
-class Belial:
-    def __init__(self):
-        self.image = load_image("Boss(70x99).png")
-        self.pattern1_image = load_image("Boss_Atk(70x128).png")
-        self.Left_Hand = Belial_LEFT_Hand("Boss_LeftHand.png", "Boss_LH_Atk(70x80).png", 200, 200)
-        self.Right_Hand = Belial_RIGHT_Hand("Boss_RightHand.png", "Boss_RH_Atk(70x80).png", 600, 200)
-        self.hp = 250
-        self.x, self.y = 400, 300
-        self.frame = 0
-        self.state = StateList.IDLE
-        self.bullet_count = 0
-
-    def update(self):
-        global belial_bullets
-
-        if self.state == StateList.PATTERN1:
-            if self.bullet_count < 30:
-                belial_bullets.append(Boss_Bullet(410, 270, self.bullet_count * 25))
-                self.bullet_count += 1
-            self.frame += 1
-            self.frame = clamp(0, self.frame, 9)
-
-            if self.bullet_count == 30:
-                self.bullet_count = 0
-                self.state = StateList.IDLE
-        else:
-            self.frame = (self.frame + 1) % 10
-
-        self.Left_Hand.update()
-        self.Right_Hand.update()
-
-    def draw(self):
-        if self.state == StateList.PATTERN1:
-            self.pattern1_image.clip_draw(70 * self.frame, 0, 70, 128, self.x, self.y)
-        else:
-            self.image.clip_draw(70 * self.frame, 0, 70, 90, self.x, self.y)
-        self.Left_Hand.draw()
-        self.Right_Hand.draw()
 
 
 def get_angle(start_x, start_y, end_x, end_y):
@@ -276,7 +124,7 @@ def enter():
     cursor = load_image("Cursor.png")
     d_count = load_image("DashCount.png")
     d_board = load_image("DashCountBase.png")
-    bg_image = load_image("SubBG-sharedassets7.assets-57.png")
+    bg_image = load_image("BackGround_Image.png")
 
 
 def exit():
@@ -385,7 +233,7 @@ def draw():
     global d_count, d_count
 
     clear_canvas()
-    bg_image.draw(400, 300, 800, 600)
+    bg_image.draw(700, 300)
     grass.draw(400, 30)
 
     d_board.draw(48, 593, 96, 14)

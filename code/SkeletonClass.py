@@ -100,7 +100,7 @@ next_state_table = {
                      RIGHT_MOVE: RightMoveState, ATTACK: AttackState},
 
     AttackState: {IDLE: IdleState, LEFT_MOVE: LeftMoveState,
-                  RIGHT_MOVE: RightMoveState},
+                  RIGHT_MOVE: RightMoveState}
 }
 
 
