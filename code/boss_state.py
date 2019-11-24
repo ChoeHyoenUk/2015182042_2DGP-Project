@@ -166,6 +166,9 @@ def handle_events():
                 game_world.remove_object(monster)
             monsters.clear()
 
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_BACKQUOTE):
+            player.selected_weapon = (player.selected_weapon + 1) % 2
+
         else:
             player.handle_event(event)
 
@@ -177,7 +180,7 @@ def update():
         game_object.update()
 
     if len(monsters) == 0:
-        delay(2)
+        delay(1)
         game_framework.quit()
 
 

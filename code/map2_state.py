@@ -165,6 +165,9 @@ def handle_events():
                 game_world.remove_object(monster)
             monsters.clear()
 
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_BACKQUOTE):
+            player.selected_weapon = (player.selected_weapon + 1) % 2
+
         else:
             player.handle_event(event)
 
