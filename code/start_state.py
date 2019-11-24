@@ -1,7 +1,7 @@
 import game_framework
 from pico2d import *
 import os
-import main_state
+import map1_state
 
 os.chdir('C:\\Users\\levy-\\Desktop\\1\\2DGP\\2015182042_2DGP-Project\\TEXTURE')
 
@@ -51,7 +51,7 @@ def update():
         e_frame = e_frame + 1
 
     if e_frame == 28:
-        game_framework.change_state(main_state)
+        game_framework.change_state(map1_state)
 
 
 def draw():
@@ -73,7 +73,7 @@ def draw():
         charactor.clip_draw(0, 32, 32, 32, x, 85, 60, 60)
 
     if e_frame == 28:
-        game_framework.change_state(main_state)
+        game_framework.change_state(map1_state)
     delay(0.02)
     update_canvas()
 

@@ -1,7 +1,7 @@
 from pico2d import *
 from BossBulletClass import Boss_Bullet
 from BossHandClass import Boss_Hand
-import main_state
+import boss_state
 
 
 PATTERN_START, PATTERN_END = range(2)
@@ -41,7 +41,7 @@ class AttackState:
     @staticmethod
     def do(belial):
         if belial.bullet_count < 30:
-            main_state.belial_bullets.append(Boss_Bullet(410, 270, belial.bullet_count * 25))
+            boss_state.belial_bullets.append(Boss_Bullet(410, 270, belial.bullet_count * 25))
             belial.bullet_count += 1
         belial.frame += 1
         belial.frame = clamp(0, belial.frame, 9)

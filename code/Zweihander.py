@@ -2,7 +2,7 @@ from pico2d import *
 import math
 
 
-class Weapon:
+class Zweihander:
     def __init__(self, X, Y, ATK, COOLDOWN, W, H, SWORD_IMAGE, SWING_IMAGE):
         self.atk = ATK
         self.cooldown = COOLDOWN

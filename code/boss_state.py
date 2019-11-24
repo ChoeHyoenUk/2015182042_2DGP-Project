@@ -2,29 +2,26 @@ import threading
 import enum
 from pico2d import *
 import game_framework
+import game_world
+import boss_state
 from PlayerClass import Player
-from BansheeClass import Banshee
-from SkeletonClass import Skeleton
 from BelialClass import Belial
+from BackGround import BackGround
 
-name = "MainState"
+name = "BossState"
 
 M_x, M_y = 0, 0
 running = True
 d_timer_run = False
 
-bg_image = None
-grass = None
 player = None
-skul_monster = None
-banshee = []
-belial = None
-banshee_bullets = []
-belial_bullets = []
-belial_sword = []
+background = None
+monsters = []
 cursor = None
 d_count = None
 d_board = None
+
+belial_bullets = []
 
 
 class StateList(enum.Enum):
@@ -107,38 +104,28 @@ def Drop_Sword():
 
 def enter():
     global player
-    global grass
-    global skul_monster
-    global banshee
-    global belial
+    global background
+    global monsters
     global cursor
     global d_count, d_board
-    global bg_image
 
+    resize_canvas(800, 600)
     player = Player()
-    grass = load_image("grass.png")
-    skul_monster = Skeleton()
-    for i in range(5):
-        banshee.append(Banshee())
-    belial = Belial()
+    background = BackGround()
+    monsters = [Belial()]
+    game_world.add_object(background, 0)
+    game_world.add_object(player, 1)
+    game_world.add_objects(monsters, 1)
     cursor = load_image("Cursor.png")
     d_count = load_image("DashCount.png")
     d_board = load_image("DashCountBase.png")
-    bg_image = load_image("BackGround_Image.png")
 
 
 def exit():
     global player
-    global grass
-    global skul_monster
-    global banshee
-    global belial
 
     del player
-    del grass
-    del skul_monster
-    del banshee
-    del belial
+    game_world.clear()
 
 
 def pause():
@@ -151,14 +138,11 @@ def resume():
 
 def handle_events():
     global player
+    global monsters
     global running
     global M_x, M_y
     global d_timer_run
-    global skul_monster
-    global banshee
-    global banshee_bullets
-    global belial
-    global belial_sword
+
     events = get_events()
 
     for event in events:
@@ -176,91 +160,34 @@ def handle_events():
             elif player.x > M_x:
                 player.stand_dir = -1
 
+        elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_k):
+            for monster in monsters:
+                game_world.remove_object(monster)
+            monsters.clear()
+
         else:
             player.handle_event(event)
 
 
 def update():
-    global player
-    global skul_monster
-    global banshee
-    global belial
-    global banshee_bullets
-    global belial_bullets
-    global belial_sword
+    global monsters
 
-    player.update()
+    for game_object in game_world.all_objects():
+        game_object.update()
 
-    belial.update()
-
-    if len(belial_bullets) > 0:
-        for bullet in belial_bullets:
-            if bullet.r > 400:
-                belial_bullets.remove(bullet)
-            else:
-                bullet.update()
-
-    for monster in banshee:
-        monster.update()
-
-    skul_monster.update()
-
-    if len(banshee_bullets) > 0:
-        for bullet in banshee_bullets:
-            if bullet.r > 300:
-                banshee_bullets.remove(bullet)
-            else:
-                bullet.update()
-
-    if len(belial_sword) > 0:
-        for sword in belial_sword:
-            if get_distant(sword.x, sword.y, sword.end_x, sword.end_y) <= 60:
-                belial_sword.remove(sword)
-                Drop_Sword()
-            else:
-                sword.update()
+    if len(monsters) == 0:
+        delay(2)
+        game_framework.quit()
 
 
 def draw():
-    global player
-    global skul_monster
-    global banshee
-    global belial
-    global banshee_bullets
-    global belial_bullets
-    global belial_sword
-    global cursor
-    global d_count, d_count
-
     clear_canvas()
-    bg_image.draw(700, 300)
-    grass.draw(400, 30)
+    for game_object in game_world.all_objects():
+        game_object.draw()
 
     d_board.draw(48, 593, 96, 14)
-
     for n in range(player.dash_count):
         d_count.draw(((n + 1) * 16) - 8, 593, 14, 8)
-
-    belial.draw()
-
-    player.draw()
-
-    if len(belial_bullets) > 0:
-        for bullet in belial_bullets:
-            bullet.draw()
-
-    for monster in banshee:
-        monster.draw()
-
-    skul_monster.draw()
-
-    if len(banshee_bullets) > 0:
-        for bullet in banshee_bullets:
-            bullet.draw()
-
-    if len(belial_sword) > 0:
-        for sword in belial_sword:
-            sword.draw()
 
     cursor.draw(M_x, M_y, 30, 30)
     update_canvas()

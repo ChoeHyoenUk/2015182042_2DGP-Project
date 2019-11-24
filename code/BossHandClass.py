@@ -1,5 +1,5 @@
 from pico2d import *
-import main_state
+import map1_state
 
 PATTERN_START, PATTERN_END = range(2)
 
@@ -25,7 +25,7 @@ class IdleState:
 class AttackState:
     @staticmethod
     def enter(boss_hand):
-        boss_hand.x, boss_hand.y = main_state.player.x - 80, main_state.player.y
+        boss_hand.x, boss_hand.y = map1_state.player.x - 80, map1_state.player.y
 
     @staticmethod
     def exit(boss_hand):

@@ -1,4 +1,5 @@
 from pico2d import *
+import random
 
 IDLE, LEFT_MOVE, RIGHT_MOVE, ATTACK = range(4)
 
@@ -116,7 +117,7 @@ class Skeleton:
         self.hp = 60
         self.atk = 7
         self.dir = 1
-        self.x, self.y = 600, 90
+        self.x, self.y = random.randint(100, 1400), 90
         self.speed = 1
         self.frame = 0
         self.atk_frame = 0

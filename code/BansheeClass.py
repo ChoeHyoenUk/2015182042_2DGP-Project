@@ -1,6 +1,6 @@
 from pico2d import *
 from BansheeBulletClass import Banshee_Bullet
-import main_state
+import map2_state
 import random
 
 TimerEvent, AllBulletCreate = range(2)
@@ -18,7 +18,7 @@ class IdleState:
 
     @staticmethod
     def do(banshee):
-        if banshee.x > main_state.player.x:
+        if banshee.x > map2_state.player.x:
             banshee.stand_dir = -1
         else:
             banshee.stand_dir = 1
@@ -46,7 +46,7 @@ class AttackState:
         banshee.frame = (banshee.frame + 1) % 6
         if banshee.frame == 5:
             for i in range(12):
-                main_state.banshee_bullets.append(Banshee_Bullet(banshee.x, banshee.y, 30*i))
+                map2_state.banshee_bullets.append(Banshee_Bullet(banshee.x, banshee.y, 30*i))
             banshee.add_event(AllBulletCreate)
 
     @staticmethod

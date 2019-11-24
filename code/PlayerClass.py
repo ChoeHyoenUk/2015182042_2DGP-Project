@@ -1,5 +1,6 @@
 from pico2d import *
-from WeaponClass import Weapon
+from FireSword import FireSword
+from Zweihander import Zweihander
 
 # Player Event
 A_DOWN, A_UP, D_DOWN, D_UP, SPACE_DOWN, RBUTTON_DOWN, LBUTTON_DOWN, MAX_DISTANCE, COLLIDE = range(9)
@@ -19,7 +20,7 @@ class IdleState:
     @staticmethod
     def enter(player, event):
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
         else:
             player.move_dir = 0
 
@@ -29,8 +30,9 @@ class IdleState:
 
     @staticmethod
     def do(player):
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 1) % 4
 
     @staticmethod
@@ -40,16 +42,16 @@ class IdleState:
         else:
             player.image.clip_draw(player.frame * 32, 0, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class LeftMoveState:
     @staticmethod
     def enter(player, event):
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
         else:
             player.move_dir = -1
 
@@ -60,8 +62,9 @@ class LeftMoveState:
     @staticmethod
     def do(player):
         player.x += player.speed * player.move_dir
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 1) % 4
 
     @staticmethod
@@ -71,16 +74,16 @@ class LeftMoveState:
         else:
             player.image.clip_draw(player.frame * 32, 64, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class RightMoveState:
     @staticmethod
     def enter(player, event):
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
         else:
             player.move_dir = 1
 
@@ -91,8 +94,9 @@ class RightMoveState:
     @staticmethod
     def do(player):
         player.x += player.speed * player.move_dir
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 1) % 4
 
     @staticmethod
@@ -102,9 +106,9 @@ class RightMoveState:
         else:
             player.image.clip_draw(player.frame * 32, 64, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class JumpState:
@@ -115,7 +119,7 @@ class JumpState:
             player.j_pos = player.y
 
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -130,8 +134,9 @@ class JumpState:
         player.y = player.y + (
                     (-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < player.j_pos:
             player.add_event(COLLIDE)
 
@@ -142,9 +147,9 @@ class JumpState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class LeftJumpState:
@@ -156,7 +161,7 @@ class LeftJumpState:
         player.move_dir = -1
 
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -172,8 +177,9 @@ class LeftJumpState:
                     (-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
         player.x += player.speed * player.move_dir
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < player.j_pos:
             player.add_event(COLLIDE)
 
@@ -184,9 +190,9 @@ class LeftJumpState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class RightJumpState:
@@ -198,7 +204,7 @@ class RightJumpState:
         player.move_dir = 1
 
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -214,8 +220,9 @@ class RightJumpState:
                     (-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
         player.x += player.speed * player.move_dir
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < player.j_pos:
             player.add_event(COLLIDE)
 
@@ -226,16 +233,16 @@ class RightJumpState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class FallState:
     @staticmethod
     def enter(player, event):
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -247,8 +254,9 @@ class FallState:
     def do(player):
         player.y = player.y + ((-6.2 * player.jump_time ** 2) / 2)  # 6.2 is gravity
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -259,9 +267,9 @@ class FallState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class LeftFallState:
@@ -270,7 +278,7 @@ class LeftFallState:
         player.jump_time = 0
         player.move_dir = -1
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -283,8 +291,9 @@ class LeftFallState:
         player.y = player.y + ((-6.2 * player.jump_time ** 2) / 2)  # 6.2 is gravity
         player.x += player.speed * player.move_dir
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -295,9 +304,9 @@ class LeftFallState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class RightFallState:
@@ -305,7 +314,7 @@ class RightFallState:
     def enter(player, event):
         player.move_dir = 1
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -318,8 +327,9 @@ class RightFallState:
         player.y = player.y + ((-6.2 * player.jump_time ** 2) / 2)  # 6.2 is gravity
         player.x += player.speed * player.move_dir
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -330,9 +340,9 @@ class RightFallState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class LeftFallState:
@@ -340,7 +350,7 @@ class LeftFallState:
     def enter(player, event):
         player.move_dir = -1
         if event == LBUTTON_DOWN:
-            player.weapon.isswing = True
+            player.weapons[player.selected_weapon].isswing = True
 
     @staticmethod
     def exit(player, event):
@@ -353,8 +363,9 @@ class LeftFallState:
         player.y = player.y + ((-6.2 * player.jump_time ** 2) / 2)  # 6.2 is gravity
         player.x += player.speed * player.move_dir
         player.jump_time += 0.02
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -365,9 +376,9 @@ class LeftFallState:
         else:
             player.image.clip_draw(0, 128, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
-        if player.weapon.isswing:
-            player.weapon.swing()
+        player.weapons[player.selected_weapon].draw()
+        if player.weapons[player.selected_weapon].isswing:
+            player.weapons[player.selected_weapon].swing()
 
 
 class DashState:
@@ -392,10 +403,12 @@ class DashState:
         player.x = (1 - t) * player.dash_start_position[0] + t * player.dash_end_position[0]
         player.y = (1 - t) * player.dash_start_position[1] + t * player.dash_end_position[1]
         player.dash_distance += 1.5
-        player.weapon.x = (30 * math.cos(player.weapon.angle / 360 * 2 * math.pi)) + player.x
-        player.weapon.y = (30 * math.sin(player.weapon.angle / 360 * 2 * math.pi)) + (player.y - 20)
+        for i in range(2):
+            player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
         if player.dash_distance > 100:
             player.add_event(MAX_DISTANCE)
+        player.frame = (player.frame + 1) % 4
 
     @staticmethod
     def draw(player):
@@ -404,7 +417,7 @@ class DashState:
         elif player.stand_dir == 1:
             player.image.clip_draw(player.frame * 32, 96, 32, 32, player.x, player.y, 60, 60)
 
-        player.weapon.draw()
+        player.weapons[player.selected_weapon].draw()
 
 
 next_state_table = {
@@ -470,8 +483,10 @@ class Player:
         self.stand_dir = 1
 
         self.speed = 1
-        self.x, self.y = 400, 85
-        self.weapon = Weapon(self.x, self.y, 7, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png")
+        self.x, self.y = 15, 85
+        self.weapons = [FireSword(self.x, self.y, 7, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png"),
+                        Zweihander(self.x, self.y, 7, 0.3, 70, 90, "Zweihander.png", "Swing.png")]
+        self.selected_weapon = 0
         self.hp = 100
         self.jump_power, self.jump_time = 6.5, 0
         self.dash_distance = 0
