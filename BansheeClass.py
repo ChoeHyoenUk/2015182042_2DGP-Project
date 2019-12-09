@@ -21,7 +21,6 @@ class Banshee:
         self.timer = None
         self.attacking = False
         self.build_behavior_tree()
-        print(self.can_attack)
 
     def set_can_attack(self):
         self.can_attack = True

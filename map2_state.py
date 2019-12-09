@@ -68,7 +68,7 @@ def enter():
 
     player = Player()
     background = BackGround()
-    monsters = [Skeleton() for i in range(5)] + [Banshee() for i in range(5)]
+    monsters = [Skeleton(2) for i in range(5)] + [Banshee() for i in range(5)]
     game_world.add_object(background, 0)
     game_world.add_object(player, 1)
     game_world.add_objects(monsters, 1)

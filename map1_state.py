@@ -23,13 +23,6 @@ d_count = None
 d_board = None
 
 
-class StateList(enum.Enum):
-    IDLE = enum.auto()
-    PATTERN1 = enum.auto()
-    PATTERN2 = enum.auto()
-    PATTERN3 = enum.auto()
-
-
 def get_angle(start_x, start_y, end_x, end_y):
     dx = end_x - start_x
     dy = end_y - start_y
@@ -61,46 +54,6 @@ def attack_timer():
     player.attack = True
 
 
-def attack_timer_start(cooldown):
-    timer = threading.Timer(cooldown, attack_timer)
-    timer.start()
-
-
-def LEFT_Laser_Shot():
-    global belial
-
-    if not belial.Left_Hand.state == StateList.PATTERN2:
-        belial.Left_Hand.state = StateList.PATTERN2
-
-
-def RIGHT_Laser_Shot():
-    global belial
-
-    if not belial.Right_Hand.state == StateList.PATTERN2:
-        belial.Right_Hand.state = StateList.PATTERN2
-
-
-def Berial_Pattern2(hand):
-    global belial
-    global player
-
-    if hand == -1:
-        belial.Left_Hand.x, belial.Left_Hand.y = player.x - 80, player.y
-        timer = threading.Timer(0.5, LEFT_Laser_Shot)
-        timer.start()
-    elif hand == 1:
-        belial.Right_Hand.x, belial.Right_Hand.y = player.x + 80, player.y
-        timer = threading.Timer(0.5, RIGHT_Laser_Shot)
-        timer.start()
-
-
-def Drop_Sword():
-    global belial_sword
-    if len(belial_sword) > 0:
-        if not belial_sword[0].state == StateList.FALL:
-            belial_sword[0].state = StateList.FALL
-
-
 def enter():
     global player
     global background
@@ -111,7 +64,9 @@ def enter():
     resize_canvas(1500, 600)
     player = Player()
     background = BackGround()
-    monsters = [Skeleton() for i in range(5)]
+    monsters = [Skeleton(1) for i in range(5)]
+    for s in monsters:
+        print(s.spawned_map)
     game_world.add_object(background, 0)
     game_world.add_object(player, 1)
     game_world.add_objects(monsters, 1)
