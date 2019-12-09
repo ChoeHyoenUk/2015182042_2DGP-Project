@@ -125,23 +125,8 @@ class Skeleton:
         self.event_que = []
         self.cur_state.enter(self)
 
-    def update_state(self):
-        if len(self.event_que) > 0:
-            event = self.event_que.pop()
-            self.cur_state.exit(self)
-            self.cur_state = next_state_table[self.cur_state][event]
-            self.cur_state.enter(self)
-
-    def add_event(self, event):
-        self.event_que.insert(0, event)
-
     def update(self):
-        self.cur_state.do(self)
-        if len(self.event_que) > 0:
-            event = self.event_que.pop()
-            self.cur_state.exit(self)
-            self.cur_state = next_state_table[self.cur_state][event]
-            self.cur_state.enter(self)
+        pass
 
     def draw(self):
-        self.cur_state.draw(self)
+        pass

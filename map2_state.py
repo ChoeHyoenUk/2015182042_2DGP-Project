@@ -1,5 +1,4 @@
 import threading
-import enum
 from pico2d import *
 import game_framework
 import game_world
@@ -22,13 +21,6 @@ next_portal = False
 cursor = None
 d_count = None
 d_board = None
-
-
-class StateList(enum.Enum):
-    IDLE = enum.auto()
-    PATTERN1 = enum.auto()
-    PATTERN2 = enum.auto()
-    PATTERN3 = enum.auto()
 
 
 def get_angle(start_x, start_y, end_x, end_y):
@@ -65,41 +57,6 @@ def attack_timer():
 def attack_timer_start(cooldown):
     timer = threading.Timer(cooldown, attack_timer)
     timer.start()
-
-
-def LEFT_Laser_Shot():
-    global belial
-
-    if not belial.Left_Hand.state == StateList.PATTERN2:
-        belial.Left_Hand.state = StateList.PATTERN2
-
-
-def RIGHT_Laser_Shot():
-    global belial
-
-    if not belial.Right_Hand.state == StateList.PATTERN2:
-        belial.Right_Hand.state = StateList.PATTERN2
-
-
-def Berial_Pattern2(hand):
-    global belial
-    global player
-
-    if hand == -1:
-        belial.Left_Hand.x, belial.Left_Hand.y = player.x - 80, player.y
-        timer = threading.Timer(0.5, LEFT_Laser_Shot)
-        timer.start()
-    elif hand == 1:
-        belial.Right_Hand.x, belial.Right_Hand.y = player.x + 80, player.y
-        timer = threading.Timer(0.5, RIGHT_Laser_Shot)
-        timer.start()
-
-
-def Drop_Sword():
-    global belial_sword
-    if len(belial_sword) > 0:
-        if not belial_sword[0].state == StateList.FALL:
-            belial_sword[0].state = StateList.FALL
 
 
 def enter():

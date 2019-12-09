@@ -3,7 +3,6 @@ from pico2d import *
 import os
 import map1_state
 
-os.chdir('C:\\Users\\levy-\\Desktop\\1\\2DGP\\2015182042_2DGP-Project\\TEXTURE')
 
 name = "StartState"
 

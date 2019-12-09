@@ -1,6 +1,6 @@
 from pico2d import *
 import math
-import main_state
+import boss_state
 
 IDLE, FALL = range(2)
 
@@ -16,9 +16,9 @@ class IdleState:
 
     @staticmethod
     def do(boss_sword):
-        boss_sword.angle = main_state.get_angle(boss_sword.x, boss_sword.y, main_state.player.x,
-                                                main_state.player.y) + 90
-        boss_sword.end_x, boss_sword.end_y = main_state.player.x, main_state.player.y - 40
+        boss_sword.angle = boss_state.get_angle(boss_sword.x, boss_sword.y, boss_state.player.x,
+                                                boss_state.player.y) + 90
+        boss_sword.end_x, boss_sword.end_y = boss_state.player.x, boss_state.player.y - 40
 
     @staticmethod
     def draw(boss_sword):
@@ -59,7 +59,7 @@ class Boss_Sword:
         self.angle = 0
         self.cur_state = IdleState
         self.start_x, self.start_y = self.x, self.y
-        self.end_x, self.end_y = main_state.player.x, main_state.player.y - 40
+        self.end_x, self.end_y = boss_state.player.x, boss_state.player.y - 40
         self.fall_distant = 0
         self.event_que = []
         self.cur_state.enter(self)
