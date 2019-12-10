@@ -1,96 +1,153 @@
 from pico2d import *
 from BossBulletClass import Boss_Bullet
 from BossHandClass import Boss_Hand
+from BossSwordClass import Boss_Sword
+from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
+import threading
 import boss_state
-
-
-PATTERN_START, PATTERN_END = range(2)
-
-
-class IdleState:
-    @staticmethod
-    def enter(belial):
-        pass
-
-    @staticmethod
-    def exit(belial):
-        pass
-
-    @staticmethod
-    def do(belial):
-        belial.frame = (belial.frame + 1) % 10
-        belial.Left_Hand.update()
-        belial.Right_Hand.update()
-
-    @staticmethod
-    def draw(belial):
-        belial.image.clip_draw(70 * belial.frame, 0, 70, 90, belial.x, belial.y)
-        belial.Left_Hand.draw()
-        belial.Right_Hand.draw()
-
-
-class AttackState:
-    @staticmethod
-    def enter(belial):
-        pass
-
-    @staticmethod
-    def exit(belial):
-        belial.bullet_count = 0
-
-    @staticmethod
-    def do(belial):
-        if belial.bullet_count < 30:
-            boss_state.belial_bullets.append(Boss_Bullet(410, 270, belial.bullet_count * 25))
-            belial.bullet_count += 1
-        belial.frame += 1
-        belial.frame = clamp(0, belial.frame, 9)
-
-        if belial.bullet_count == 30:
-            belial.add_event(PATTERN_END)
-
-    @staticmethod
-    def draw(belial):
-        belial.pattern1_image.clip_draw(70 * belial.frame, 0, 70, 128, belial.x, belial.y)
-
-
-next_state_table = {
-    IdleState: {PATTERN_START: AttackState},
-    AttackState: {PATTERN_END: IdleState}
-}
+import game_world
 
 
 class Belial:
     def __init__(self):
         self.image = load_image("Boss(70x99).png")
         self.pattern1_image = load_image("Boss_Atk(70x128).png")
-        self.Left_Hand = Boss_Hand("Boss_LeftHand.png", "Boss_LH_Atk(70x80).png", 200, 200)
-        self.Right_Hand = Boss_Hand("Boss_RightHand.png", "Boss_RH_Atk(70x80).png", 600, 200)
+        self.Left_Hand = Boss_Hand("Boss_LeftHand.png", "Boss_LH_Atk(70x80).png", 200, 200, -1)
+        self.Right_Hand = Boss_Hand("Boss_RightHand.png", "Boss_RH_Atk(70x80).png", 600, 200, 1)
         self.hp = 250
         self.x, self.y = 400, 300
         self.frame = 0
-        self.cur_state = IdleState
         self.bullet_count = 0
-        self.event_que = []
-        self.cur_state.enter(self)
+        self.bullet_pattern_check = False
+        self.laser_pattern_check = False
+        self.sword_pattern_check = False
+        self.bullet_pattern_timer = None
+        self.laser_pattern_timer = None
+        self.left_laser_shot_func_call_timer = None
+        self.right_laser_shot_func_call_timer = None
+        self.sword_pattern_timer = None
+        self.is_bullet_pattern_timer_run = False
+        self.is_laser_pattern_timer_run = False
+        self.is_left_laser_shot_func_called = False
+        self.is_right_laser_shot_func_called = False
+        self.is_sword_pattern_timer_run = False
+        self.build_behavior_tree()
 
-    def update_state(self):
-        if len(self.event_que) > 0:
-            event = self.event_que.pop()
-            self.cur_state.exit(self)
-            self.cur_state = next_state_table[self.cur_state][event]
-            self.cur_state.enter(self)
+    def bullet_pattern_timer_func(self):
+        self.is_bullet_pattern_timer_run = False
+        self.bullet_pattern_check = True
 
-    def add_event(self, event):
-        self.event_que.insert(0, event)
+    def laser_pattern_timer_func(self):
+        self.is_laser_pattern_timer_run = False
+        self.laser_pattern_check = True
+
+    def call_left_laser_shot_func(self):
+        if not self.is_left_laser_shot_func_called:
+            self.Left_Hand.x, self.Left_Hand.y = boss_state.player.x - 80, boss_state.player.y
+        return BehaviorTree.SUCCESS
+
+    def call_right_laser_shot_func(self):
+        if not self.is_right_laser_shot_func_called:
+            self.Right_Hand.x, self.Right_Hand.y = boss_state.player.x + 80, boss_state.player.y
+        return BehaviorTree.SUCCESS
+
+    def bullet_pattern_cooltime_check(self):
+        if self.bullet_pattern_check:
+            return BehaviorTree.SUCCESS
+        else:
+            if not self.is_bullet_pattern_timer_run:
+                self.is_bullet_pattern_timer_run = True
+                self.bullet_pattern_timer = threading.Timer(5, self.bullet_pattern_timer_func)
+                self.bullet_pattern_timer.start()
+            return BehaviorTree.FAIL
+
+    def laser_pattern_cooltime_check(self):
+        if self.laser_pattern_check:
+            return BehaviorTree.SUCCESS
+        else:
+            if not self.is_laser_pattern_timer_run:
+                self.is_laser_pattern_timer_run = True
+                self.laser_pattern_timer = threading.Timer(7, self.laser_pattern_timer_func)
+                self.laser_pattern_timer.start()
+            return BehaviorTree.FAIL
+
+    def sword_pattern_cooltime_check(self):
+        if len(boss_state.belial_sword) == 0:
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.FAIL
+
+    def bullet_pattern(self):
+        if self.bullet_count < 30:
+            game_world.add_object(Boss_Bullet(410, 270, self.bullet_count * 25), 1)
+            self.bullet_count += 1
+        self.frame += 1
+        self.frame = clamp(0, self.frame, 9)
+
+        if self.bullet_count == 30:
+            self.bullet_pattern_check = False
+            self.is_bullet_pattern_timer_run = True
+            self.bullet_count = 0
+            self.bullet_pattern_timer = threading.Timer(5, self.bullet_pattern_timer_func)
+            self.bullet_pattern_timer.start()
+            return BehaviorTree.SUCCESS
+        return BehaviorTree.RUNNING
+
+    def left_laser_shot(self):
+        if self.Left_Hand.laser_shot() == -1:
+            return BehaviorTree.RUNNING
+        return BehaviorTree.SUCCESS
+
+    def right_laser_shot(self):
+        if self.Right_Hand.laser_shot() == -1:
+            return BehaviorTree.RUNNING
+        self.laser_pattern_check = False
+        self.is_laser_pattern_timer_run = True
+        self.laser_pattern_timer = threading.Timer(7, self.laser_pattern_timer_func)
+        self.laser_pattern_timer.start()
+        return BehaviorTree.SUCCESS
+
+    def create_sword(self):
+        for i in range(5):
+            boss_state.belial_sword.append(Boss_Sword(60*i))
+        boss_state.sword_drop_timer = threading.Timer(3, boss_state.Drop_Sword)
+        boss_state.sword_drop_timer.start()
+        return BehaviorTree.SUCCESS
+
+    def idle(self):
+        self.frame = (self.frame + 1) % 10
+        return BehaviorTree.SUCCESS
+
+    def build_behavior_tree(self):
+        bullet_pattern_node = SequenceNode("Bullet Pattern")
+        bullet_pattern_cooltime_check_node = LeafNode("B-CoolTime Check", self.bullet_pattern_cooltime_check)
+        create_bullet_node = LeafNode("Create Bullet", self.bullet_pattern)
+        bullet_pattern_node.add_children(bullet_pattern_cooltime_check_node, create_bullet_node)
+
+        laser_pattern_node = SequenceNode("Laser Pattern")
+        laser_pattern_cooltime_check_node = LeafNode("L-CoolTime Check", self.laser_pattern_cooltime_check)
+        lefthand_move_node = LeafNode("LeftHand Move", self.call_left_laser_shot_func)
+        left_laser_shot_node = LeafNode("Left Laser Shot", self.left_laser_shot)
+        righthand_move_node = LeafNode("RightHand Move", self.call_right_laser_shot_func)
+        right_laser_shot_node = LeafNode("Right Laser Shot", self.right_laser_shot)
+        laser_pattern_node.add_children(laser_pattern_cooltime_check_node, lefthand_move_node, left_laser_shot_node,
+                                        righthand_move_node, right_laser_shot_node)
+
+        sword_pattern_node = SequenceNode("Sword Pattern")
+        sword_pattern_cooltime_check_node = LeafNode("S-CoolTime Check", self.sword_pattern_cooltime_check)
+        create_sword_node = LeafNode("Create Sword", self.create_sword)
+        sword_pattern_node.add_children(sword_pattern_cooltime_check_node, create_sword_node)
+
+        idle_node = LeafNode("Idle", self.idle)
+
+        belial_node = SelectorNode("Belial")
+        belial_node.add_children(bullet_pattern_node, laser_pattern_node, sword_pattern_node, idle_node)
+        self.bt = BehaviorTree(belial_node)
 
     def update(self):
-        self.cur_state.do(self)
-        if len(self.event_que) > 0:
-            event = self.event_que.pop()
-            self.cur_state.exit(self)
-            self.cur_state = next_state_table[self.cur_state][event]
-            self.cur_state.enter(self)
+        self.bt.run()
 
     def draw(self):
-        self.cur_state.draw(self)
+        self.image.clip_draw(70 * self.frame, 0, 70, 90, self.x, self.y)
+        self.Left_Hand.draw()
+        self.Right_Hand.draw()

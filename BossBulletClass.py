@@ -1,4 +1,5 @@
 from pico2d import *
+import game_world
 
 
 class Boss_Bullet:
@@ -22,6 +23,8 @@ class Boss_Bullet:
         self.x = Boss_Bullet.cen_x + (self.r * math.cos(self.angle / 360 * 2 * math.pi))
         self.y = Boss_Bullet.cen_y + (self.r * math.sin(self.angle / 360 * 2 * math.pi))
         self.r += 1
+        if self.r >= 300:
+            game_world.remove_object(self)
 
     def draw(self):
         Boss_Bullet.image.draw(self.x, self.y, 25, 25)

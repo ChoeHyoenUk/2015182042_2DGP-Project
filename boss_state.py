@@ -3,7 +3,6 @@ import enum
 from pico2d import *
 import game_framework
 import game_world
-import boss_state
 from PlayerClass import Player
 from BelialClass import Belial
 from BackGround import BackGround
@@ -17,18 +16,11 @@ d_timer_run = False
 player = None
 background = None
 monsters = []
+belial_sword = []
+sword_drop_timer = None
 cursor = None
 d_count = None
 d_board = None
-
-belial_bullets = []
-
-
-class StateList(enum.Enum):
-    IDLE = enum.auto()
-    PATTERN1 = enum.auto()
-    PATTERN2 = enum.auto()
-    PATTERN3 = enum.auto()
 
 
 def get_angle(start_x, start_y, end_x, end_y):
@@ -62,44 +54,16 @@ def attack_timer():
     player.attack = True
 
 
-def attack_timer_start(cooldown):
-    timer = threading.Timer(cooldown, attack_timer)
-    timer.start()
-
-
-def LEFT_Laser_Shot():
-    global belial
-
-    if not belial.Left_Hand.state == StateList.PATTERN2:
-        belial.Left_Hand.state = StateList.PATTERN2
-
-
-def RIGHT_Laser_Shot():
-    global belial
-
-    if not belial.Right_Hand.state == StateList.PATTERN2:
-        belial.Right_Hand.state = StateList.PATTERN2
-
-
-def Berial_Pattern2(hand):
-    global belial
-    global player
-
-    if hand == -1:
-        belial.Left_Hand.x, belial.Left_Hand.y = player.x - 80, player.y
-        timer = threading.Timer(0.5, LEFT_Laser_Shot)
-        timer.start()
-    elif hand == 1:
-        belial.Right_Hand.x, belial.Right_Hand.y = player.x + 80, player.y
-        timer = threading.Timer(0.5, RIGHT_Laser_Shot)
-        timer.start()
-
-
 def Drop_Sword():
     global belial_sword
+    global sword_drop_timer
+
     if len(belial_sword) > 0:
-        if not belial_sword[0].state == StateList.FALL:
-            belial_sword[0].state = StateList.FALL
+        if not belial_sword[0].state == 0:
+            belial_sword[0].state = 0
+            return
+    sword_drop_timer = threading.Timer(3, Drop_Sword)
+    sword_drop_timer.start()
 
 
 def enter():
@@ -108,6 +72,7 @@ def enter():
     global monsters
     global cursor
     global d_count, d_board
+    global sword_drop_timer
 
     resize_canvas(800, 600)
     player = Player()
@@ -175,9 +140,14 @@ def handle_events():
 
 def update():
     global monsters
+    global belial_sword
 
     for game_object in game_world.all_objects():
         game_object.update()
+
+    if not len(belial_sword) == 0:
+        for s in belial_sword:
+            s.update()
 
     if len(monsters) == 0:
         delay(1)
@@ -185,6 +155,8 @@ def update():
 
 
 def draw():
+    global belial_sword
+
     clear_canvas()
     for game_object in game_world.all_objects():
         game_object.draw()
@@ -192,6 +164,10 @@ def draw():
     d_board.draw(48, 593, 96, 14)
     for n in range(player.dash_count):
         d_count.draw(((n + 1) * 16) - 8, 593, 14, 8)
+
+    if not len(belial_sword) == 0:
+        for s in belial_sword:
+            s.draw()
 
     cursor.draw(M_x, M_y, 30, 30)
     update_canvas()

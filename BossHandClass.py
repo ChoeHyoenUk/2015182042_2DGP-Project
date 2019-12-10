@@ -1,5 +1,7 @@
 from pico2d import *
+from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 import boss_state
+import threading
 
 PATTERN_START, PATTERN_END = range(2)
 
@@ -51,33 +53,40 @@ next_state_table = {
 
 
 class Boss_Hand:
-    def __init__(self, hand_image, atk_image, x, y):
+    def __init__(self, hand_image, atk_image, x, y, hand):
         self.image = load_image(hand_image)
         self.atk_image = load_image(atk_image)
         self.laser = load_image("Boss_Laser(320x55).png")
         self.x, self.y = x, y
-        self.cur_state = IdleState
         self.frame = 0
-        self.event_que = []
-        self.cur_state.enter(self)
+        self.which_hand = hand
+        self.laser_pattern = False
 
-    def update_state(self):
-        if len(self.event_que) > 0:
-            event = self.event_que.pop()
-            self.cur_state.exit(self)
-            self.cur_state = next_state_table[self.cur_state][event]
-            self.cur_state.enter(self)
-
-    def add_event(self, event):
-        self.event_que.insert(0, event)
+    def laser_shot(self):
+        if not self.laser_pattern:
+            self.laser_pattern = True
+        self.frame += 1
+        if self.frame > 8:
+            if self.which_hand == -1:
+                self.frame = 0
+                self.laser_pattern = False
+                return 1
+            else:
+                self.frame = 0
+                self.laser_pattern = False
+                return 1
+        return -1
 
     def update(self):
-        self.cur_state.do(self)
-        if len(self.event_que) > 0:
-            event = self.event_que.pop()
-            self.cur_state.exit(self)
-            self.cur_state = next_state_table[self.cur_state][event]
-            self.cur_state.enter(self)
+        pass
 
     def draw(self):
-        self.cur_state.draw(self)
+        if not self.laser_pattern:
+            self.image.draw(self.x, self.y)
+        else:
+            self.atk_image.clip_draw(self.frame * 70, 0, 70, 80, self.x, self.y)
+            if self.frame >= 2:
+                if self.which_hand == -1:
+                    self.laser.clip_draw(0, self.frame * 55, 320, 55, self.x + 195, self.y)
+                else:
+                    self.laser.clip_composite_draw(0, self.frame * 55, 320, 55, 0, 'h', self.x - 195, self.y, 320, 55)

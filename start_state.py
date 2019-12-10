@@ -44,7 +44,7 @@ def update():
     global x, c_frame, e_frame
 
     if x < 600:
-        x += 1
+        x += 2
         c_frame = (c_frame + 1) % 4
     else:
         e_frame = e_frame + 1
