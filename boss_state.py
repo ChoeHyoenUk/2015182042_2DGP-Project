@@ -120,7 +120,8 @@ def handle_events():
         elif event.type == SDL_MOUSEMOTION:
             M_x, M_y = event.x, 600 - 1 - event.y
             for i in range(2):
-                player.weapons[i].angle = get_angle(player.x, player.y, M_x, M_y)
+                if not player.weapons[i].isswing:
+                    player.weapons[i].angle = get_angle(player.x, player.y, M_x, M_y)
             if player.x < M_x:
                 player.stand_dir = 1
             elif player.x > M_x:

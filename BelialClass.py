@@ -6,6 +6,7 @@ from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 import threading
 import boss_state
 import game_world
+import game_framework
 
 
 class Belial:
@@ -115,7 +116,7 @@ class Belial:
         return BehaviorTree.SUCCESS
 
     def idle(self):
-        self.frame = (self.frame + 1) % 10
+        self.frame = (self.frame + 10 * (1.0/1.0) * game_framework.frame_time) % 10
         return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
@@ -148,6 +149,6 @@ class Belial:
         self.bt.run()
 
     def draw(self):
-        self.image.clip_draw(70 * self.frame, 0, 70, 90, self.x, self.y)
+        self.image.clip_draw(70 * int(self.frame), 0, 70, 90, self.x, self.y)
         self.Left_Hand.draw()
         self.Right_Hand.draw()

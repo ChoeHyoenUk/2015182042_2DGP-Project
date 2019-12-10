@@ -1,5 +1,6 @@
 from pico2d import *
 import game_world
+import game_framework
 
 
 class Boss_Bullet:
@@ -22,7 +23,7 @@ class Boss_Bullet:
     def update(self):
         self.x = Boss_Bullet.cen_x + (self.r * math.cos(self.angle / 360 * 2 * math.pi))
         self.y = Boss_Bullet.cen_y + (self.r * math.sin(self.angle / 360 * 2 * math.pi))
-        self.r += 1
+        self.r += 150 * game_framework.frame_time
         if self.r >= 300:
             game_world.remove_object(self)
 

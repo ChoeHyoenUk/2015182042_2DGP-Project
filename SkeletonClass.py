@@ -3,6 +3,7 @@ import random
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 import map1_state
 import map2_state
+import game_framework
 
 
 class Skeleton:
@@ -19,7 +20,7 @@ class Skeleton:
         self.dir = 1
         self.x, self.y = random.randint(100, 1400), 100
         self.moving_point = None
-        self.speed = 1
+        self.speed = 75
         self.frame = 0
         self.atk_frame = 0
         self.state = "Idle"
@@ -57,13 +58,14 @@ class Skeleton:
         if not self.state == "Attack":
             self.state = "Attack"
 
-        self.atk_frame = self.atk_frame + 1
+        self.atk_frame = (self.atk_frame + 12 * (1.0/1.5) * game_framework.frame_time)
         # if atk_frame is 2~6 collision check with player later
 
-        if self.atk_frame > 11:
+        if self.atk_frame >= 12:
             self.state = "Idle"
             self.atk_frame = 0
             return BehaviorTree.SUCCESS
+        self.atk_frame %= 12
         return BehaviorTree.RUNNING
 
     def get_point(self):
@@ -77,7 +79,7 @@ class Skeleton:
     def move_to_point(self):
         if not self.state == "Moving":
             self.state = "Moving"
-        self.x += self.dir * self.speed
+        self.x += self.dir * self.speed * game_framework.frame_time
 
         if self.spawned_map == 1:
             if self.collide(map1_state.player):
@@ -87,9 +89,9 @@ class Skeleton:
             if self.collide(map2_state.player):
                 return BehaviorTree.FAIL
 
-        self.frame = (self.frame + 1) % 6
+        self.frame = (self.frame + 6 * (1.0/0.5) * game_framework.frame_time) % 6
         distance = (self.moving_point - self.x) ** 2
-        if distance <= 0:
+        if distance <= 5:
             self.state = "Idle"
             return BehaviorTree.SUCCESS
         else:
@@ -114,22 +116,24 @@ class Skeleton:
     def draw(self):
         if self.state == "Idle":
             if self.dir == -1:
-                Skeleton.image.clip_draw(self.frame * 33, 0, 33, 30, self.x, self.y, 33, 90)
+                Skeleton.image.clip_draw(int(self.frame) * 33, 0, 33, 30, self.x, self.y, 33, 90)
                 draw_rectangle(self.x - 54, self.y - 45, self.x - 16, self.y + 45)
             elif self.dir == 1:
-                Skeleton.image.clip_draw(self.frame * 33, 30, 33, 30, self.x, self.y, 33, 90)
+                Skeleton.image.clip_draw(int(self.frame) * 33, 30, 33, 30, self.x, self.y, 33, 90)
                 draw_rectangle(self.x + 16, self.y - 45, self.x + 54, self.y + 45)
 
         elif self.state == "Attack":
             if self.dir == -1:
-                Skeleton.Atk_image.clip_draw(self.atk_frame * 71, 0, 71, 48, self.x - 18, self.y + 30, 71, 144)
+                Skeleton.Atk_image.clip_draw(int(self.atk_frame) * 71, 0, 71, 48, self.x - 18, self.y + 30, 71, 144)
+                draw_rectangle((self.x - 18) - 36, (self.y + 30) - 72, (self.x - 18) + 3, (self.y + 30) + 72)
             elif self.dir == 1:
-                Skeleton.Atk_image.clip_draw(self.atk_frame * 71, 48, 71, 48, self.x + 18, self.y + 30, 71, 144)
+                Skeleton.Atk_image.clip_draw(int(self.atk_frame) * 71, 48, 71, 48, self.x + 18, self.y + 30, 71, 144)
+                draw_rectangle((self.x + 18) + 3, (self.y + 30) - 72, (self.x + 18) + 36, (self.y + 30) + 72)
 
         else:
             if self.dir == -1:
-                Skeleton.image.clip_draw(self.frame * 33, 60, 33, 30, self.x, self.y, 33, 90)
+                Skeleton.image.clip_draw(int(self.frame) * 33, 60, 33, 30, self.x, self.y, 33, 90)
                 draw_rectangle(self.x - 54, self.y - 45, self.x - 16, self.y + 45)
             elif self.dir == 1:
-                Skeleton.image.clip_draw(self.frame * 33, 90, 33, 30, self.x, self.y, 33, 90)
+                Skeleton.image.clip_draw(int(self.frame) * 33, 90, 33, 30, self.x, self.y, 33, 90)
                 draw_rectangle(self.x + 16, self.y - 45, self.x + 54, self.y + 45)

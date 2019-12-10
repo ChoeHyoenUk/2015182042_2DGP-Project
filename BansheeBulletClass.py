@@ -1,6 +1,7 @@
 from pico2d import *
 import math
 import game_world
+import game_framework
 
 
 class Banshee_Bullet:
@@ -22,10 +23,10 @@ class Banshee_Bullet:
     def update(self):
         self.x = (self.r * math.cos(self.angle / 360 * 2 * math.pi)) + self.cen_x
         self.y = (self.r * math.sin(self.angle / 360 * 2 * math.pi)) + self.cen_y
-        self.r += 3
+        self.r += 100 * game_framework.frame_time
         if self.r >= 300:
             game_world.remove_object(self)
-        self.frame = (self.frame + 1) % 4
+        self.frame = (self.frame + 4 * (1.0/0.5) * game_framework.frame_time) % 4
 
     def draw(self):
-        Banshee_Bullet.image.clip_draw(self.frame * 13, 0, 13, 16, self.x, self.y, 20, 20)
+        Banshee_Bullet.image.clip_draw(int(self.frame) * 13, 0, 13, 16, self.x, self.y, 20, 20)

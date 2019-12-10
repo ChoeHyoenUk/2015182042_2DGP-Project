@@ -5,6 +5,7 @@ import map2_state
 import game_world
 import random
 import threading
+import game_framework
 
 
 class Banshee:
@@ -36,8 +37,8 @@ class Banshee:
             self.frame = 0
             self.attacking = True
 
-        self.frame = (self.frame + 1) % 6
-        if self.frame == 5:
+        self.frame = (self.frame + 6 * (1.0/0.5) * game_framework.frame_time)
+        if self.frame >= 6:
             for i in range(12):
                 game_world.add_object(Banshee_Bullet(self.x, self.y, 30 * i), 1)
             self.can_attack = False
@@ -45,6 +46,7 @@ class Banshee:
             self.timer = threading.Timer(5, self.set_can_attack)
             self.timer.start()
             return BehaviorTree.SUCCESS
+        self.frame %= 6
         return BehaviorTree.RUNNING
 
     def change_dir(self):
@@ -52,7 +54,7 @@ class Banshee:
             self.stand_dir = -1
         else:
             self.stand_dir = 1
-        self.frame = (self.frame + 1) % 6
+        self.frame = (self.frame + 6 * (1.0/0.5) * game_framework.frame_time) % 6
         return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
@@ -71,12 +73,12 @@ class Banshee:
     def draw(self):
         if self.attacking:
             if self.stand_dir == 1:
-                Banshee.image.clip_draw(self.frame * 20, 22, 20, 22, self.x, self.y, 30, 30)
+                Banshee.image.clip_draw(int(self.frame) * 20, 22, 20, 22, self.x, self.y, 30, 30)
             elif self.stand_dir == -1:
-                Banshee.image.clip_composite_draw(self.frame * 20, 22, 20, 22, 0, 'h', self.x, self.y, 30, 30)
+                Banshee.image.clip_composite_draw(int(self.frame) * 20, 22, 20, 22, 0, 'h', self.x, self.y, 30, 30)
         else:
             if self.stand_dir == 1:
-                Banshee.image.clip_draw(self.frame * 20, 0, 20, 22, self.x, self.y, 30, 30)
+                Banshee.image.clip_draw(int(self.frame) * 20, 0, 20, 22, self.x, self.y, 30, 30)
             elif self.stand_dir == -1:
-                Banshee.image.clip_composite_draw(self.frame * 20, 0, 20, 22, 0, 'h', self.x, self.y, 30, 30)
+                Banshee.image.clip_composite_draw(int(self.frame) * 20, 0, 20, 22, 0, 'h', self.x, self.y, 30, 30)
 
