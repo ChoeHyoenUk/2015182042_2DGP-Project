@@ -2,6 +2,8 @@ from pico2d import *
 import math
 import game_framework
 import normal_stage
+import boss_stage
+
 
 class Zweihander:
     def __init__(self, X, Y, ATK, COOLDOWN, W, H, SWORD_IMAGE, SWING_IMAGE):
@@ -17,7 +19,12 @@ class Zweihander:
         self.hitbox_x, self.hitbox_y = self.x, self.y
         self.hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + X
         self.hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (Y - 20)
+        self.swing_sound = load_wav('fire_swing.wav')
+        self.swing_sound.set_volume(32)
+        self.sound_play = True
         self.isswing = False
+        self.in_boss_stage = False
+
 
     def attack_collide(self, monster):
         if -90 <= self.angle <= 90:
@@ -36,6 +43,10 @@ class Zweihander:
         return True
 
     def swing(self):
+        if self.sound_play:
+            self.swing_sound.play()
+            self.sound_play = False
+
         if -90 <= self.angle <= 90:
             self.swing_image.clip_composite_draw(self.W * int(self.frame), 0, self.W, self.H, self.angle / 360 * 2 * math.pi,
                                                  'v',
@@ -52,16 +63,30 @@ class Zweihander:
             draw_rectangle(self.hitbox_minus_x - 95, self.hitbox_minus_y - 55,
                            self.hitbox_minus_x + 17.5, self.hitbox_minus_y + 75)
 
-        for m in normal_stage.monsters:
-            if self.attack_collide(m) and not m.hit:
-                m.hp -= self.atk
-                m.hit = True
+        if not self.in_boss_stage:
+            for m in normal_stage.monsters:
+                if self.attack_collide(m) and not m.hit:
+                    m.hp -= self.atk
+                    m.hit = True
+        else:
+            for m in boss_stage.monsters:
+                if self.attack_collide(m) and not m.hit:
+                    m.hp -= self.atk
+                    print(m.hp)
+                    m.hit = True
 
         self.frame = (self.frame + 4 * (1.0 / 0.5) * game_framework.frame_time)
+
         if self.frame >= 4:
             self.isswing = False
-            for m in normal_stage.monsters:
-                m.hit = False
+            if not self.in_boss_stage:
+                for m in normal_stage.monsters:
+                    m.hit = False
+            else:
+                for m in boss_stage.monsters:
+                    m.hit = False
+            self.sound_play = True
+
         self.frame %= 4
 
     def draw(self):

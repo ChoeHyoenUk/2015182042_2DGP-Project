@@ -75,6 +75,7 @@ class LeftMoveState:
             player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
             player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 4 * (1.0 / 0.5) * game_framework.frame_time ) % 4
+        player.move_sound.play()
 
     @staticmethod
     def draw(player):
@@ -111,6 +112,7 @@ class RightMoveState:
             player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
             player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 4 * (1.0 / 0.5) * game_framework.frame_time ) % 4
+        player.move_sound.play()
 
     @staticmethod
     def draw(player):
@@ -130,6 +132,7 @@ class JumpState:
         if not player.jumping:
             player.jumping = True
             player.j_pos = player.y
+            player.jump_sound.play()
 
         if event == LBUTTON_DOWN:
             player.weapons[player.selected_weapon].isswing = True
@@ -174,6 +177,7 @@ class LeftJumpState:
         if not player.jumping:
             player.jumping = True
             player.j_pos = player.y
+            player.jump_sound.play()
         player.move_dir = -1
 
         if event == LBUTTON_DOWN:
@@ -220,6 +224,7 @@ class RightJumpState:
         if not player.jumping:
             player.jumping = True
             player.j_pos = player.y
+            player.jump_sound.play()
         player.move_dir = 1
 
         if event == LBUTTON_DOWN:
@@ -502,6 +507,11 @@ class Player:
 
         self.event_que = []
         self.cur_state.enter(self, None)
+
+        self.move_sound = load_wav('move.wav')
+        self.jump_sound = load_wav('jump.wav')
+        self.move_sound.set_volume(32)
+        self.jump_sound.set_volume(32)
 
     def update_state(self):
         if len(self.event_que) > 0:

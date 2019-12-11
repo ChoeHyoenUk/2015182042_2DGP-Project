@@ -35,6 +35,9 @@ class Belial:
         self.is_sword_pattern_timer_run = False
         self.build_behavior_tree()
 
+    def get_bb(self):
+        return self.x - 35, self.y - 45, self.x + 35, self.y + 45
+
     def bullet_pattern_timer_func(self):
         self.is_bullet_pattern_timer_run = False
         self.bullet_pattern_check = True

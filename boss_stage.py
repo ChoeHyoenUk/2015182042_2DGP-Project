@@ -21,6 +21,7 @@ sword_drop_timer = None
 cursor = None
 d_count = None
 d_board = None
+bgm = None
 
 
 def get_angle(start_x, start_y, end_x, end_y):
@@ -73,9 +74,12 @@ def enter():
     global cursor
     global d_count, d_board
     global sword_drop_timer
+    global bgm
 
     resize_canvas(800, 600)
     player = Player()
+    for i in range(2):
+        player.weapons[i].in_boss_stage = True
     background = BackGround()
     monsters = [Belial()]
     game_world.add_object(background, 0)
@@ -84,12 +88,16 @@ def enter():
     cursor = load_image("Cursor.png")
     d_count = load_image("DashCount.png")
     d_board = load_image("DashCountBase.png")
-
+    bgm = load_wav('boss_stage.wav')
+    bgm.set_volume(32)
+    bgm.repeat_play()
 
 def exit():
     global player
+    global bgm
 
     del player
+    del bgm
     game_world.clear()
 
 
