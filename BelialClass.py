@@ -19,6 +19,7 @@ class Belial:
         self.x, self.y = 400, 300
         self.frame = 0
         self.bullet_count = 0
+        self.hit = False
         self.bullet_pattern_check = False
         self.laser_pattern_check = False
         self.sword_pattern_check = False
@@ -147,6 +148,9 @@ class Belial:
 
     def update(self):
         self.bt.run()
+        if self.hp <= 0:
+            boss_stage.monsters.remove(self)
+            game_world.remove_object(self)
 
     def draw(self):
         self.image.clip_draw(70 * int(self.frame), 0, 70, 90, self.x, self.y)

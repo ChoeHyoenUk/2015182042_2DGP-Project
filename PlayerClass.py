@@ -34,6 +34,10 @@ class IdleState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 4 * (1.0 / 0.5) * game_framework.frame_time ) % 4
 
     @staticmethod
@@ -66,6 +70,10 @@ class LeftMoveState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 4 * (1.0 / 0.5) * game_framework.frame_time ) % 4
 
     @staticmethod
@@ -98,6 +106,10 @@ class RightMoveState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         player.frame = (player.frame + 4 * (1.0 / 0.5) * game_framework.frame_time ) % 4
 
     @staticmethod
@@ -137,6 +149,10 @@ class JumpState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < player.j_pos:
             player.add_event(COLLIDE)
 
@@ -179,6 +195,10 @@ class LeftJumpState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < player.j_pos:
             player.add_event(COLLIDE)
 
@@ -222,6 +242,10 @@ class RightJumpState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < player.j_pos:
             player.add_event(COLLIDE)
 
@@ -256,6 +280,10 @@ class FallState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -293,6 +321,10 @@ class LeftFallState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -329,6 +361,10 @@ class RightFallState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.y < 85:
             player.add_event(COLLIDE)
 
@@ -369,6 +405,10 @@ class DashState:
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
             player.weapons[i].y = (30 * math.sin(player.weapons[i].angle / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_x = (30 * math.cos(0 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_y = (30 * math.sin(0 / 360 * 2 * math.pi)) + (player.y - 20)
+            player.weapons[i].hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + player.x
+            player.weapons[i].hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (player.y - 20)
         if player.dash_distance > 100:
             player.add_event(MAX_DISTANCE)
         player.frame = (player.frame + 4 * (1.0 / 0.5) * game_framework.frame_time ) % 4
@@ -447,8 +487,8 @@ class Player:
 
         self.speed = 150
         self.x, self.y = 15, 85
-        self.weapons = [FireSword(self.x, self.y, 7, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png"),
-                        Zweihander(self.x, self.y, 7, 0.3, 70, 90, "Zweihander.png", "Swing.png")]
+        self.weapons = [FireSword(self.x, self.y, 3, 0.3, 49, 60, "Fire_Sword.png", "Fire_Swing.png"),
+                        Zweihander(self.x, self.y, 15, 0.3, 70, 90, "Zweihander.png", "Swing.png")]
         self.selected_weapon = 0
         self.hp = 100
         self.jump_power, self.jump_time = 6.5, 0

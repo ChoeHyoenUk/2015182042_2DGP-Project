@@ -1,7 +1,7 @@
 from pico2d import *
 import math
 import game_framework
-
+import normal_stage
 
 class Zweihander:
     def __init__(self, X, Y, ATK, COOLDOWN, W, H, SWORD_IMAGE, SWING_IMAGE):
@@ -14,7 +14,26 @@ class Zweihander:
         self.angle = 0
         self.x = (30 * math.cos(self.angle / 360 * 2 * math.pi)) + X
         self.y = (30 * math.sin(self.angle / 360 * 2 * math.pi)) + (Y - 20)
+        self.hitbox_x, self.hitbox_y = self.x, self.y
+        self.hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + X
+        self.hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (Y - 20)
         self.isswing = False
+
+    def attack_collide(self, monster):
+        if -90 <= self.angle <= 90:
+            left_a, bottom_a, right_a, top_a = self.hitbox_x - 17.5, self.hitbox_y - 55, \
+                                               self.hitbox_x + 95, self.hitbox_y + 75
+        else:
+            left_a, bottom_a, right_a, top_a = self.hitbox_minus_x - 95, self.hitbox_minus_y - 55, \
+                                               self.hitbox_minus_x + 17.5, self.hitbox_minus_y + 75
+
+        left_b, bottom_b, right_b, top_b = monster.get_bb()
+
+        if left_a > right_b: return False
+        if right_a < left_b: return False
+        if top_a < bottom_b: return False
+        if bottom_a > top_b: return False
+        return True
 
     def swing(self):
         if -90 <= self.angle <= 90:
@@ -23,15 +42,26 @@ class Zweihander:
                                                  self.x + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
                                                  self.y + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
                                                  self.W + 60, self.H + 35)
+            draw_rectangle(self.hitbox_x - 17.5, self.hitbox_y - 55, self.hitbox_x + 95, self.hitbox_y + 75)
         else:
             self.swing_image.clip_composite_draw(self.W * int(self.frame), 0, self.W, self.H, self.angle / 360 * 2 * math.pi,
                                                  'v',
                                                  self.x + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
                                                  self.y + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
                                                  self.W + 60, self.H + 35)
+            draw_rectangle(self.hitbox_minus_x - 95, self.hitbox_minus_y - 55,
+                           self.hitbox_minus_x + 17.5, self.hitbox_minus_y + 75)
+
+        for m in normal_stage.monsters:
+            if self.attack_collide(m) and not m.hit:
+                m.hp -= self.atk
+                m.hit = True
+
         self.frame = (self.frame + 4 * (1.0 / 0.5) * game_framework.frame_time)
         if self.frame >= 4:
             self.isswing = False
+            for m in normal_stage.monsters:
+                m.hit = False
         self.frame %= 4
 
     def draw(self):

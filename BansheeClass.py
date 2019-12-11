@@ -14,14 +14,18 @@ class Banshee:
     def __init__(self):
         if Banshee.image is None:
             Banshee.image = load_image("Banshee(20x22).png")
-        self.hp = 40
-        self.x, self.y = random.randint(20, 780), random.randint(400, 500)
+        self.hp = 30
+        self.x, self.y = random.randint(20, 780), random.randint(300, 350)
         self.stand_dir = 1
         self.frame = random.randint(0, 5)
         self.can_attack = True
         self.timer = None
         self.attacking = False
+        self.hit = False
         self.build_behavior_tree()
+
+    def get_bb(self):
+        return self.x - 15, self.y - 15, self.x + 15, self.y + 15
 
     def set_can_attack(self):
         self.can_attack = True
@@ -37,7 +41,7 @@ class Banshee:
             self.frame = 0
             self.attacking = True
 
-        self.frame = (self.frame + 6 * (1.0/0.5) * game_framework.frame_time)
+        self.frame = (self.frame + 6 * (1.0 / 0.5) * game_framework.frame_time)
         if self.frame >= 6:
             for i in range(12):
                 game_world.add_object(Banshee_Bullet(self.x, self.y, 30 * i), 1)
@@ -54,7 +58,7 @@ class Banshee:
             self.stand_dir = -1
         else:
             self.stand_dir = 1
-        self.frame = (self.frame + 6 * (1.0/0.5) * game_framework.frame_time) % 6
+        self.frame = (self.frame + 6 * (1.0 / 0.5) * game_framework.frame_time) % 6
         return BehaviorTree.SUCCESS
 
     def build_behavior_tree(self):
@@ -69,6 +73,9 @@ class Banshee:
 
     def update(self):
         self.bt.run()
+        if self.hp <= 0:
+            normal_stage.monsters.remove(self)
+            game_world.remove_object(self)
 
     def draw(self):
         if self.attacking:
@@ -76,9 +83,11 @@ class Banshee:
                 Banshee.image.clip_draw(int(self.frame) * 20, 22, 20, 22, self.x, self.y, 30, 30)
             elif self.stand_dir == -1:
                 Banshee.image.clip_composite_draw(int(self.frame) * 20, 22, 20, 22, 0, 'h', self.x, self.y, 30, 30)
+
         else:
             if self.stand_dir == 1:
                 Banshee.image.clip_draw(int(self.frame) * 20, 0, 20, 22, self.x, self.y, 30, 30)
             elif self.stand_dir == -1:
                 Banshee.image.clip_composite_draw(int(self.frame) * 20, 0, 20, 22, 0, 'h', self.x, self.y, 30, 30)
-        draw_rectangle(self.x - 15, self.y - 15, self.x + 15, self.y + 15)
+
+        draw_rectangle(*self.get_bb())
