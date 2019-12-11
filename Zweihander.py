@@ -26,6 +26,9 @@ class Zweihander:
         self.in_boss_stage = False
 
 
+    def set_background(self, back):
+        self.bg = back
+
     def attack_collide(self, monster):
         if -90 <= self.angle <= 90:
             left_a, bottom_a, right_a, top_a = self.hitbox_x - 17.5, self.hitbox_y - 55, \
@@ -43,6 +46,7 @@ class Zweihander:
         return True
 
     def swing(self):
+        cx, cy = self.x - self.bg.window_left, self.y - self.bg.window_bottom
         if self.sound_play:
             self.swing_sound.play()
             self.sound_play = False
@@ -50,18 +54,15 @@ class Zweihander:
         if -90 <= self.angle <= 90:
             self.swing_image.clip_composite_draw(self.W * int(self.frame), 0, self.W, self.H, self.angle / 360 * 2 * math.pi,
                                                  'v',
-                                                 self.x + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
-                                                 self.y + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
+                                                 cx + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
+                                                 cy + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
                                                  self.W + 60, self.H + 35)
-            draw_rectangle(self.hitbox_x - 17.5, self.hitbox_y - 55, self.hitbox_x + 95, self.hitbox_y + 75)
         else:
             self.swing_image.clip_composite_draw(self.W * int(self.frame), 0, self.W, self.H, self.angle / 360 * 2 * math.pi,
                                                  'v',
-                                                 self.x + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
-                                                 self.y + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
+                                                 cx + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
+                                                 cy + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
                                                  self.W + 60, self.H + 35)
-            draw_rectangle(self.hitbox_minus_x - 95, self.hitbox_minus_y - 55,
-                           self.hitbox_minus_x + 17.5, self.hitbox_minus_y + 75)
 
         if not self.in_boss_stage:
             for m in normal_stage.monsters:
@@ -90,7 +91,8 @@ class Zweihander:
         self.frame %= 4
 
     def draw(self):
+        cx, cy = self.x - self.bg.window_left, self.y - self.bg.window_bottom
         if -90 <= self.angle <= 90:
-            self.image.rotate_draw(self.angle / 360 * 2 * math.pi, self.x, self.y, 25, 50)
+            self.image.rotate_draw(self.angle / 360 * 2 * math.pi, cx, cy, 25, 50)
         else:
-            self.image.composite_draw(self.angle / 360 * 2 * math.pi, 'v', self.x, self.y, 25, 50)
+            self.image.composite_draw(self.angle / 360 * 2 * math.pi, 'v', cx, cy, 25, 50)

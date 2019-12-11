@@ -6,7 +6,8 @@ import boss_stage
 from PlayerClass import Player
 from SkeletonClass import Skeleton
 from BansheeClass import Banshee
-from BackGround import BackGround
+# from BackGround import BackGround
+from Scrolling import FixedBackground as BackGround
 
 name = "NormalStage"
 
@@ -53,11 +54,6 @@ def dash_timer_start():
         timer.cancel()
 
 
-def attack_timer():
-    global player
-    player.attack = True
-
-
 def change_stage():
     global player
     global next_portal
@@ -68,6 +64,8 @@ def change_stage():
     player.x = 15
     next_portal = False
     monsters = [Skeleton(1) for i in range(5)] + [Banshee() for i in range(5)]
+    for m in monsters:
+        m.set_background(background)
     game_world.add_objects(monsters, 1)
 
 
@@ -80,13 +78,20 @@ def enter():
     global blackimage
     global bgm
 
-    resize_canvas(1500, 600)
     player = Player()
-    background = BackGround()
+    background = BackGround(False)
     monsters = [Skeleton(1) for i in range(5)]
-    game_world.add_object(background, 0)
     game_world.add_object(player, 1)
     game_world.add_objects(monsters, 1)
+    game_world.add_object(background, 0)
+
+    background.set_center_object(player)
+    player.set_background(background)
+    for i in range(2):
+        player.weapons[i].set_background(background)
+    for m in monsters:
+        m.set_background(background)
+
     blackimage = load_image('Black_Image.png')
     cursor = load_image("Cursor.png")
     d_count = load_image("DashCount.png")
@@ -94,6 +99,7 @@ def enter():
     bgm = load_wav('normal_stage.wav')
     bgm.set_volume(32)
     bgm.repeat_play()
+    update()
 
 
 def exit():
@@ -123,6 +129,7 @@ def handle_events():
     events = get_events()
 
     for event in events:
+        cx, cy = player.x - player.bg.window_left, player.y - player.bg.window_bottom
         if event.type == SDL_QUIT:
             game_framework.quit()
 
@@ -133,10 +140,10 @@ def handle_events():
             M_x, M_y = event.x, 600 - 1 - event.y
             for i in range(2):
                 if not player.weapons[i].isswing:
-                    player.weapons[i].angle = get_angle(player.x, player.y, M_x, M_y)
-            if player.x < M_x:
+                    player.weapons[i].angle = get_angle(cx, cy, M_x, M_y)
+            if player.x % 800 < M_x:
                 player.stand_dir = 1
-            elif player.x > M_x:
+            elif player.x % 800 > M_x:
                 player.stand_dir = -1
 
         elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_k):

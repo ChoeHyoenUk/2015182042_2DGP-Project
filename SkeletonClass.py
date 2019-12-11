@@ -28,6 +28,9 @@ class Skeleton:
         self.hit = False
         self.build_behavior_tree()
 
+    def set_background(self, back):
+        self.bg = back
+
     def get_bb(self):
         return self.x - 16.5, self.y - 45, self.x + 16.5, self.y + 45
 
@@ -39,6 +42,7 @@ class Skeleton:
 
         left_b, bottom_b, right_b, top_b = b.x - 15, b.y - 30, b.x + 15, b.y
 
+        if normal_stage.player.opacity_mode: return False
         if left_a > right_b: return False
         if right_a < left_b: return False
         if top_a < bottom_b: return False
@@ -56,6 +60,7 @@ class Skeleton:
         left_b, bottom_b, right_b, top_b = normal_stage.player.x - 15, normal_stage.player.y - 30, \
                                            normal_stage.player.x + 15, normal_stage.player.y
 
+        if normal_stage.player.opacity_mode: return False
         if left_a > right_b: return False
         if right_a < left_b: return False
         if top_a < bottom_b: return False
@@ -132,32 +137,21 @@ class Skeleton:
             game_world.remove_object(self)
 
     def draw(self):
+        cx, cy = self.x - self.bg.window_left, self.y - self.bg.window_bottom
         if self.state == "Idle":
             if self.dir == -1:
-                Skeleton.image.clip_draw(int(self.frame) * 33, 0, 33, 30, self.x, self.y, 33, 90)
-                draw_rectangle(self.x - 54, self.y - 45, self.x - 16, self.y + 45)
-                draw_rectangle(*self.get_bb())
+                Skeleton.image.clip_draw(int(self.frame) * 33, 0, 33, 30, cx, cy, 33, 90)
             elif self.dir == 1:
-                Skeleton.image.clip_draw(int(self.frame) * 33, 30, 33, 30, self.x, self.y, 33, 90)
-                draw_rectangle(self.x + 16, self.y - 45, self.x + 54, self.y + 45)
-                draw_rectangle(*self.get_bb())
+                Skeleton.image.clip_draw(int(self.frame) * 33, 30, 33, 30, cx, cy, 33, 90)
 
         elif self.state == "Attack":
             if self.dir == -1:
-                Skeleton.Atk_image.clip_draw(int(self.atk_frame) * 71, 0, 71, 48, self.x - 18, self.y + 30, 71, 144)
-                draw_rectangle((self.x - 18) - 36, (self.y + 30) - 72, (self.x - 18) + 3, (self.y + 30) + 72)
-                draw_rectangle(*self.get_bb())
+                Skeleton.Atk_image.clip_draw(int(self.atk_frame) * 71, 0, 71, 48, cx - 18, cy + 30, 71, 144)
             elif self.dir == 1:
-                Skeleton.Atk_image.clip_draw(int(self.atk_frame) * 71, 48, 71, 48, self.x + 18, self.y + 30, 71, 144)
-                draw_rectangle((self.x + 18) + 3, (self.y + 30) - 72, (self.x + 18) + 36, (self.y + 30) + 72)
-                draw_rectangle(*self.get_bb())
+                Skeleton.Atk_image.clip_draw(int(self.atk_frame) * 71, 48, 71, 48, cx + 18, cy + 30, 71, 144)
 
         else:
             if self.dir == -1:
-                Skeleton.image.clip_draw(int(self.frame) * 33, 60, 33, 30, self.x, self.y, 33, 90)
-                draw_rectangle(self.x - 54, self.y - 45, self.x - 16, self.y + 45)
-                draw_rectangle(*self.get_bb())
+                Skeleton.image.clip_draw(int(self.frame) * 33, 60, 33, 30, cx, cy, 33, 90)
             elif self.dir == 1:
-                Skeleton.image.clip_draw(int(self.frame) * 33, 90, 33, 30, self.x, self.y, 33, 90)
-                draw_rectangle(self.x + 16, self.y - 45, self.x + 54, self.y + 45)
-                draw_rectangle(*self.get_bb())
+                Skeleton.image.clip_draw(int(self.frame) * 33, 90, 33, 30, cx, cy, 33, 90)

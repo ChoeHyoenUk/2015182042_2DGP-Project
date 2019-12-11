@@ -33,7 +33,7 @@ class Boss_Sword:
             self.hit_point_y = self.y + (60 * math.sin((self.angle - 90) / 360 * 2 * math.pi))
             self.fall_distant += 1 * game_framework.frame_time
             if boss_stage.player.x - 15 <= self.hit_point_x <= boss_stage.player.x + 15 and boss_stage.player.y - 30 <= self.hit_point_y <= boss_stage.player.y:
-                if not self.hit_player:
+                if not self.hit_player and not boss_stage.player.opacity_mode:
                     boss_stage.player.hp -= Boss_Sword.Atk
                     self.hit_player = True
             if self.fall_distant >= 1:

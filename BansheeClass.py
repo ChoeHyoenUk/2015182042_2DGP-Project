@@ -24,6 +24,9 @@ class Banshee:
         self.hit = False
         self.build_behavior_tree()
 
+    def set_background(self, back):
+        self.bg = back
+
     def get_bb(self):
         return self.x - 15, self.y - 15, self.x + 15, self.y + 15
 
@@ -78,16 +81,15 @@ class Banshee:
             game_world.remove_object(self)
 
     def draw(self):
+        cx, cy = self.x - self.bg.window_left, self.y - self.bg.window_bottom
         if self.attacking:
             if self.stand_dir == 1:
-                Banshee.image.clip_draw(int(self.frame) * 20, 22, 20, 22, self.x, self.y, 30, 30)
+                Banshee.image.clip_draw(int(self.frame) * 20, 22, 20, 22, cx, cy, 30, 30)
             elif self.stand_dir == -1:
-                Banshee.image.clip_composite_draw(int(self.frame) * 20, 22, 20, 22, 0, 'h', self.x, self.y, 30, 30)
+                Banshee.image.clip_composite_draw(int(self.frame) * 20, 22, 20, 22, 0, 'h', cx, cy, 30, 30)
 
         else:
             if self.stand_dir == 1:
-                Banshee.image.clip_draw(int(self.frame) * 20, 0, 20, 22, self.x, self.y, 30, 30)
+                Banshee.image.clip_draw(int(self.frame) * 20, 0, 20, 22, cx, cy, 30, 30)
             elif self.stand_dir == -1:
-                Banshee.image.clip_composite_draw(int(self.frame) * 20, 0, 20, 22, 0, 'h', self.x, self.y, 30, 30)
-
-        draw_rectangle(*self.get_bb())
+                Banshee.image.clip_composite_draw(int(self.frame) * 20, 0, 20, 22, 0, 'h', cx, cy, 30, 30)

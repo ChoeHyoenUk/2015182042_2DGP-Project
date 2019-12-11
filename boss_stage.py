@@ -1,11 +1,10 @@
 import threading
-import enum
 from pico2d import *
 import game_framework
 import game_world
+from Scrolling import FixedBackground as BackGround
 from PlayerClass import Player
 from BelialClass import Belial
-from BackGround import BackGround
 
 name = "BossState"
 
@@ -34,27 +33,6 @@ def get_distant(x1, y1, x2, y2):
     return math.sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2))
 
 
-def dash_timer_start():
-    global player
-    global d_timer_run
-    timer = threading.Timer(2, dash_timer_start)
-
-    if player.dash_count < 6:
-        if not d_timer_run:
-            d_timer_run = True
-        else:
-            player.dash_count += 1
-        timer.start()
-    else:
-        d_timer_run = False
-        timer.cancel()
-
-
-def attack_timer():
-    global player
-    player.attack = True
-
-
 def Drop_Sword():
     global belial_sword
     global sword_drop_timer
@@ -80,17 +58,22 @@ def enter():
     player = Player()
     for i in range(2):
         player.weapons[i].in_boss_stage = True
-    background = BackGround()
+    background = BackGround(True)
     monsters = [Belial()]
     game_world.add_object(background, 0)
     game_world.add_object(player, 1)
     game_world.add_objects(monsters, 1)
+    background.set_center_object(player)
+    player.set_background(background)
+    for i in range(2):
+        player.weapons[i].set_background(background)
     cursor = load_image("Cursor.png")
     d_count = load_image("DashCount.png")
     d_board = load_image("DashCountBase.png")
     bgm = load_wav('boss_stage.wav')
     bgm.set_volume(32)
     bgm.repeat_play()
+    update()
 
 def exit():
     global player
@@ -150,6 +133,10 @@ def handle_events():
 def update():
     global monsters
     global belial_sword
+    global player
+
+    if player.hp <= 0:
+        game_framework.quit()
 
     for game_object in game_world.all_objects():
         game_object.update()
