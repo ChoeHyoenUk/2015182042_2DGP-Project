@@ -4,7 +4,7 @@ from BossHandClass import Boss_Hand
 from BossSwordClass import Boss_Sword
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 import threading
-import boss_state
+import boss_stage
 import game_world
 import game_framework
 
@@ -44,12 +44,12 @@ class Belial:
 
     def call_left_laser_shot_func(self):
         if not self.is_left_laser_shot_func_called:
-            self.Left_Hand.x, self.Left_Hand.y = boss_state.player.x - 80, boss_state.player.y
+            self.Left_Hand.x, self.Left_Hand.y = boss_stage.player.x - 80, boss_stage.player.y
         return BehaviorTree.SUCCESS
 
     def call_right_laser_shot_func(self):
         if not self.is_right_laser_shot_func_called:
-            self.Right_Hand.x, self.Right_Hand.y = boss_state.player.x + 80, boss_state.player.y
+            self.Right_Hand.x, self.Right_Hand.y = boss_stage.player.x + 80, boss_stage.player.y
         return BehaviorTree.SUCCESS
 
     def bullet_pattern_cooltime_check(self):
@@ -73,7 +73,7 @@ class Belial:
             return BehaviorTree.FAIL
 
     def sword_pattern_cooltime_check(self):
-        if len(boss_state.belial_sword) == 0:
+        if len(boss_stage.belial_sword) == 0:
             return BehaviorTree.SUCCESS
         else:
             return BehaviorTree.FAIL
@@ -110,9 +110,9 @@ class Belial:
 
     def create_sword(self):
         for i in range(5):
-            boss_state.belial_sword.append(Boss_Sword(60*i))
-        boss_state.sword_drop_timer = threading.Timer(3, boss_state.Drop_Sword)
-        boss_state.sword_drop_timer.start()
+            boss_stage.belial_sword.append(Boss_Sword(60*i))
+        boss_stage.sword_drop_timer = threading.Timer(3, boss_stage.Drop_Sword)
+        boss_stage.sword_drop_timer.start()
         return BehaviorTree.SUCCESS
 
     def idle(self):
@@ -152,3 +152,4 @@ class Belial:
         self.image.clip_draw(70 * int(self.frame), 0, 70, 90, self.x, self.y)
         self.Left_Hand.draw()
         self.Right_Hand.draw()
+        draw_rectangle(self.x - 35, self.y - 45, self.x + 35, self.y + 45)

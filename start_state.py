@@ -1,7 +1,7 @@
 import game_framework
 from pico2d import *
 import os
-import map1_state
+import normal_stage
 
 
 name = "StartState"
@@ -50,7 +50,7 @@ def update():
         e_frame = e_frame + 1
 
     if e_frame == 28:
-        game_framework.change_state(map1_state)
+        game_framework.change_state(normal_stage)
 
 
 def draw():

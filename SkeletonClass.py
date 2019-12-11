@@ -1,8 +1,7 @@
 from pico2d import *
 import random
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
-import map1_state
-import map2_state
+import normal_stage
 import game_framework
 
 
@@ -24,7 +23,7 @@ class Skeleton:
         self.frame = 0
         self.atk_frame = 0
         self.state = "Idle"
-        self.spawned_map = num
+        self.hit_player = False
         self.build_behavior_tree()
 
     def collide(self, b):
@@ -41,29 +40,45 @@ class Skeleton:
         if bottom_a > top_b: return False
         return True
 
-    def find_player(self):
-        if self.spawned_map == 1:
-            if self.collide(map1_state.player):
-                return BehaviorTree.SUCCESS
-            else:
-                return BehaviorTree.FAIL
+    def attack_collide(self):
+        if self.dir == -1:
+            left_a, bottom_a, right_a, top_a = (self.x - 18) - 36, (self.y + 30) - 72, (self.x - 18) + 3, (
+                        self.y + 30) + 72
+        else:
+            left_a, bottom_a, right_a, top_a = (self.x + 18) + 3, (self.y + 30) - 72, (self.x + 18) + 36, (
+                        self.y + 30) + 72
 
-        elif self.spawned_map == 2:
-            if self.collide(map2_state.player):
-                return BehaviorTree.SUCCESS
-            else:
-                return BehaviorTree.FAIL
+        left_b, bottom_b, right_b, top_b = normal_stage.player.x - 15, normal_stage.player.y - 30, \
+                                           normal_stage.player.x + 15, normal_stage.player.y
+
+        if left_a > right_b: return False
+        if right_a < left_b: return False
+        if top_a < bottom_b: return False
+        if bottom_a > top_b: return False
+        return True
+
+    def find_player(self):
+        if self.collide(normal_stage.player):
+            return BehaviorTree.SUCCESS
+        else:
+            return BehaviorTree.FAIL
 
     def attack(self):
         if not self.state == "Attack":
             self.state = "Attack"
 
-        self.atk_frame = (self.atk_frame + 12 * (1.0/1.5) * game_framework.frame_time)
+        self.atk_frame = (self.atk_frame + 12 * (1.0 / 1.5) * game_framework.frame_time)
         # if atk_frame is 2~6 collision check with player later
+        if 2 <= self.atk_frame <= 6:
+            if self.attack_collide() and not self.hit_player:
+                normal_stage.player.hp -= self.attack_power
+                self.hit_player = True
+                print(normal_stage.player.hp)
 
         if self.atk_frame >= 12:
             self.state = "Idle"
             self.atk_frame = 0
+            self.hit_player = False
             return BehaviorTree.SUCCESS
         self.atk_frame %= 12
         return BehaviorTree.RUNNING
@@ -81,15 +96,10 @@ class Skeleton:
             self.state = "Moving"
         self.x += self.dir * self.speed * game_framework.frame_time
 
-        if self.spawned_map == 1:
-            if self.collide(map1_state.player):
-                return BehaviorTree.FAIL
+        if self.collide(normal_stage.player):
+            return BehaviorTree.FAIL
 
-        elif self.spawned_map == 2:
-            if self.collide(map2_state.player):
-                return BehaviorTree.FAIL
-
-        self.frame = (self.frame + 6 * (1.0/0.5) * game_framework.frame_time) % 6
+        self.frame = (self.frame + 6 * (1.0 / 0.5) * game_framework.frame_time) % 6
         distance = (self.moving_point - self.x) ** 2
         if distance <= 5:
             self.state = "Idle"

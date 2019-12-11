@@ -132,8 +132,7 @@ class JumpState:
 
     @staticmethod
     def do(player):
-        player.y = player.y + (
-                    (-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
+        player.y = player.y + ((-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
         player.jump_time += 0.02
         for i in range(2):
             player.weapons[i].x = (30 * math.cos(player.weapons[i].angle / 360 * 2 * math.pi)) + player.x
@@ -174,8 +173,7 @@ class LeftJumpState:
 
     @staticmethod
     def do(player):
-        player.y = player.y + (
-                    (-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
+        player.y = player.y + ((-6.2 / 2) * player.jump_time ** 2 + player.jump_power * player.jump_time)  # 6.2 is gravity
         player.x += player.speed * player.move_dir * game_framework.frame_time
         player.jump_time += 0.02
         for i in range(2):
@@ -389,7 +387,7 @@ next_state_table = {
     IdleState: {A_DOWN: LeftMoveState, D_DOWN: RightMoveState,
                 A_UP: IdleState, D_UP: IdleState,
                 SPACE_DOWN: JumpState, RBUTTON_DOWN: DashState,
-                LBUTTON_DOWN: IdleState},
+                LBUTTON_DOWN: IdleState, COLLIDE: IdleState},
 
     LeftMoveState: {A_DOWN: LeftMoveState, A_UP: IdleState,
                     D_DOWN: RightMoveState, D_UP: LeftMoveState,

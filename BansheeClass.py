@@ -1,7 +1,7 @@
 from pico2d import *
 from BansheeBulletClass import Banshee_Bullet
 from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
-import map2_state
+import normal_stage
 import game_world
 import random
 import threading
@@ -50,7 +50,7 @@ class Banshee:
         return BehaviorTree.RUNNING
 
     def change_dir(self):
-        if self.x > map2_state.player.x:
+        if self.x > normal_stage.player.x:
             self.stand_dir = -1
         else:
             self.stand_dir = 1
@@ -81,4 +81,4 @@ class Banshee:
                 Banshee.image.clip_draw(int(self.frame) * 20, 0, 20, 22, self.x, self.y, 30, 30)
             elif self.stand_dir == -1:
                 Banshee.image.clip_composite_draw(int(self.frame) * 20, 0, 20, 22, 0, 'h', self.x, self.y, 30, 30)
-
+        draw_rectangle(self.x - 15, self.y - 15, self.x + 15, self.y + 15)

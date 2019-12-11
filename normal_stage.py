@@ -1,14 +1,14 @@
 import threading
-import enum
 from pico2d import *
 import game_framework
 import game_world
-import map2_state
+import boss_stage
 from PlayerClass import Player
 from SkeletonClass import Skeleton
+from BansheeClass import Banshee
 from BackGround import BackGround
 
-name = "Map1State"
+name = "NormalStage"
 
 M_x, M_y = 0, 0
 running = True
@@ -16,11 +16,14 @@ d_timer_run = False
 
 player = None
 background = None
+blackimage = None
 monsters = []
 next_portal = False
 cursor = None
 d_count = None
 d_board = None
+
+which_stage = 1
 
 
 def get_angle(start_x, start_y, end_x, end_y):
@@ -54,12 +57,26 @@ def attack_timer():
     player.attack = True
 
 
+def change_stage():
+    global player
+    global next_portal
+    global monsters
+    global which_stage
+
+    which_stage = 2
+    player.x = 15
+    next_portal = False
+    monsters = [Skeleton(1) for i in range(5)] + [Banshee() for i in range(5)]
+    game_world.add_objects(monsters, 1)
+
+
 def enter():
     global player
     global background
     global monsters
     global cursor
     global d_count, d_board
+    global blackimage
 
     resize_canvas(1500, 600)
     player = Player()
@@ -68,6 +85,7 @@ def enter():
     game_world.add_object(background, 0)
     game_world.add_object(player, 1)
     game_world.add_objects(monsters, 1)
+    blackimage = load_image('Black_Image.png')
     cursor = load_image("Cursor.png")
     d_count = load_image("DashCount.png")
     d_board = load_image("DashCountBase.png")
@@ -129,6 +147,10 @@ def handle_events():
 def update():
     global next_portal
     global monsters
+    global player
+
+    if player.hp <= 0:
+        game_framework.quit()
 
     for game_object in game_world.all_objects():
         game_object.update()
@@ -137,7 +159,11 @@ def update():
         next_portal = True
 
     if player.x >= 1500 and next_portal:
-        game_framework.change_state(map2_state)
+        if which_stage == 1:
+            blackimage.draw(750, 300, 1500, 600)
+            change_stage()
+        else:
+            game_framework.change_state(boss_stage)
 
 
 def draw():
