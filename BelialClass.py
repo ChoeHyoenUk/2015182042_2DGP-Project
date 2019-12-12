@@ -15,6 +15,8 @@ class Belial:
         self.pattern1_image = load_image("Boss_Atk(70x128).png")
         self.Left_Hand = Boss_Hand("Boss_LeftHand.png", "Boss_LH_Atk(70x80).png", 200, 200, -1)
         self.Right_Hand = Boss_Hand("Boss_RightHand.png", "Boss_RH_Atk(70x80).png", 600, 200, 1)
+        self.font = load_font('ENCR10B.TTF', 16)
+        self.state = "Idle"
         self.hp = 250
         self.x, self.y = 400, 300
         self.frame = 0
@@ -83,6 +85,8 @@ class Belial:
             return BehaviorTree.FAIL
 
     def bullet_pattern(self):
+        if not self.state == "Attack":
+            self.state = "Attack"
         if self.bullet_count < 30:
             game_world.add_object(Boss_Bullet(410, 270, self.bullet_count * 25), 1)
             self.bullet_count += 1
@@ -90,6 +94,7 @@ class Belial:
         self.frame = clamp(0, self.frame, 9)
 
         if self.bullet_count == 30:
+            self.state = "Idle"
             self.bullet_pattern_check = False
             self.is_bullet_pattern_timer_run = True
             self.bullet_count = 0
@@ -156,7 +161,10 @@ class Belial:
             game_world.remove_object(self)
 
     def draw(self):
-        self.image.clip_draw(70 * int(self.frame), 0, 70, 90, self.x, self.y)
+        if self.state == "Idle":
+            self.image.clip_draw(70 * int(self.frame), 0, 70, 90, self.x, self.y)
+        else:
+            self.pattern1_image.clip_draw(630, 0, 70, 128, self.x, self.y)
         self.Left_Hand.draw()
         self.Right_Hand.draw()
-        draw_rectangle(self.x - 35, self.y - 45, self.x + 35, self.y + 45)
+        self.font.draw(self.x - 35, self.y + 70, 'HP : %d' % self.hp, (255, 0, 0))

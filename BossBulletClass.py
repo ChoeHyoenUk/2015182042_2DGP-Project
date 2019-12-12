@@ -9,6 +9,7 @@ class Boss_Bullet:
     cen_x, cen_y = None, None
     image = None
     d_image = None
+    hit_player_sound = None
 
     def __init__(self, x, y, angle):
         if (Boss_Bullet.cen_x, Boss_Bullet.cen_y) == (None, None):
@@ -17,6 +18,9 @@ class Boss_Bullet:
             Boss_Bullet.image = load_image("BossBullet.png")
         if Boss_Bullet.d_image is None:
             Boss_Bullet.d_image = load_image("BossBullet_Del.png")
+        if Boss_Bullet.hit_player_sound is None:
+            Boss_Bullet.hit_player_sound = load_wav('hit_player.wav')
+            Boss_Bullet.hit_player_sound.set_volume(64)
         self.x, self.y = 0, 0
         self.angle = angle
         self.r = 0
@@ -27,7 +31,7 @@ class Boss_Bullet:
         left_b, bottom_b, right_b, top_b = boss_stage.player.x - 15, boss_stage.player.y - 30, \
                                            boss_stage.player.x + 15, boss_stage.player.y
 
-        if normal_stage.player.opacity_mode: return False
+        if boss_stage.player.opacity_mode: return False
         if left_a > right_b: return False
         if right_a < left_b: return False
         if top_a < bottom_b: return False
@@ -40,8 +44,8 @@ class Boss_Bullet:
         self.r += 150 * game_framework.frame_time
 
         if self.attack_collide():
+            Boss_Bullet.hit_player_sound.play()
             boss_stage.player.hp -= Boss_Bullet.Atk
-            print(boss_stage.player.hp)
             game_world.remove_object(self)
 
         if self.r >= 300:

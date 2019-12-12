@@ -20,7 +20,9 @@ class FireSword:
         self.hitbox_minus_x = (30 * math.cos(180 / 360 * 2 * math.pi)) + X
         self.hitbox_minus_y = (30 * math.sin(180 / 360 * 2 * math.pi)) + (Y - 20)
         self.swing_sound = load_wav('fire_swing.wav')
-        self.swing_sound.set_volume(32)
+        self.swing_sound.set_volume(64)
+        self.hit_monster_sound = load_wav('hit_monster.wav')
+        self.hit_monster_sound.set_volume(64)
         self.sound_play = True
         self.isswing = False
         self.in_boss_stage = False
@@ -62,23 +64,26 @@ class FireSword:
                                                  self.angle / 360 * 2 * math.pi,
                                                  'v',
                                                  cx + (self.W / 2 * math.cos(self.angle / 360 * 2 * math.pi)),
-                                                 c + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
+                                                 cy + (self.W / 2 * math.sin(self.angle / 360 * 2 * math.pi)),
                                                  self.W + 60, self.H + 35)
 
         if not self.in_boss_stage:
             for m in normal_stage.monsters:
                 if self.attack_collide(m) and not m.hit:
+                    self.hit_monster_sound.play()
                     m.hp -= self.atk
                     m.hit = True
         else:
             for m in boss_stage.monsters:
                 if self.attack_collide(m) and not m.hit:
+                    self.hit_monster_sound.play()
                     m.hp -= self.atk
                     m.hit = True
 
         self.frame = (self.frame + 4 * (1.0 / 0.2) * game_framework.frame_time)
         if self.frame >= 4:
             self.isswing = False
+            self.sound_play = True
             if not self.in_boss_stage:
                 for m in normal_stage.monsters:
                     m.hit = False

@@ -11,17 +11,18 @@ import game_framework
 class Banshee:
     image = None
 
-    def __init__(self):
+    def __init__(self, x):
         if Banshee.image is None:
             Banshee.image = load_image("Banshee(20x22).png")
         self.hp = 30
-        self.x, self.y = random.randint(20, 780), random.randint(300, 350)
+        self.x, self.y = x, random.randint(300, 350)
         self.stand_dir = 1
         self.frame = random.randint(0, 5)
         self.can_attack = True
         self.timer = None
         self.attacking = False
         self.hit = False
+        self.font = load_font('ENCR10B.TTF', 16)
         self.build_behavior_tree()
 
     def set_background(self, back):
@@ -93,3 +94,4 @@ class Banshee:
                 Banshee.image.clip_draw(int(self.frame) * 20, 0, 20, 22, cx, cy, 30, 30)
             elif self.stand_dir == -1:
                 Banshee.image.clip_composite_draw(int(self.frame) * 20, 0, 20, 22, 0, 'h', cx, cy, 30, 30)
+        self.font.draw(cx - 35, cy + 20, 'HP : %d' % self.hp, (255, 0, 0))

@@ -8,18 +8,24 @@ import normal_stage
 class Banshee_Bullet:
     image = None
     d_image = None
+    hit_player_sound = None
 
     def __init__(self, x, y, angle):
         if Banshee_Bullet.image is None:
             Banshee_Bullet.image = load_image("BanShee_Bullet(13x16).png")
         if Banshee_Bullet.d_image is None:
             Banshee_Bullet.d_image = load_image("Banshee_Bullet_Del(20x27).png")
+        if Banshee_Bullet.hit_player_sound is None:
+            Banshee_Bullet.hit_player_sound = load_wav('hit_player.wav')
+            Banshee_Bullet.hit_player_sound.set_volume(64)
+
         self.atk = 5
         self.r = 0
         self.cen_x, self.cen_y = x, y
         self.x, self.y = 0, 0
         self.angle = angle
         self.frame = 0
+
         self.set_background()
 
     def set_background(self):
@@ -44,8 +50,8 @@ class Banshee_Bullet:
         self.r += 100 * game_framework.frame_time
 
         if self.attack_collide():
+            Banshee_Bullet.hit_player_sound.play()
             normal_stage.player.hp -= self.atk
-            print(normal_stage.player.hp)
             game_world.remove_object(self)
 
         if self.r >= 300:

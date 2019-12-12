@@ -12,6 +12,8 @@ class Boss_Hand:
         self.laser_atk = 15
         self.frame = 0
         self.which_hand = hand
+        self.hit_player_sound = load_wav('hit_player.wav')
+        self.hit_player_sound.set_volume(64)
         self.hit_player = False
         self.laser_pattern = False
 
@@ -24,7 +26,7 @@ class Boss_Hand:
         left_b, bottom_b, right_b, top_b = boss_stage.player.x - 15, boss_stage.player.y - 30, \
                                            boss_stage.player.x + 15, boss_stage.player.y
 
-        if normal_stage.player.opacity_mode: return False
+        if boss_stage.player.opacity_mode: return False
         if left_a > right_b: return False
         if right_a < left_b: return False
         if top_a < bottom_b: return False
@@ -38,9 +40,9 @@ class Boss_Hand:
 
         if self.frame >= 2:
             if self.attack_collide() and not self.hit_player:
+                self.hit_player_sound.play()
                 self.hit_player = True
                 boss_stage.player.hp -= self.laser_atk
-                print(boss_stage.player.hp)
 
         if self.frame > 8:
             self.frame = 0

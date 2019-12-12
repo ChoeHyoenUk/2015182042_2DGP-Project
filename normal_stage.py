@@ -63,7 +63,7 @@ def change_stage():
     which_stage = 2
     player.x = 15
     next_portal = False
-    monsters = [Skeleton(1) for i in range(5)] + [Banshee() for i in range(5)]
+    monsters = [Skeleton(1) for i in range(5)] + [Banshee(200+(300 * i)) for i in range(5)]
     for m in monsters:
         m.set_background(background)
     game_world.add_objects(monsters, 1)
@@ -97,7 +97,7 @@ def enter():
     d_count = load_image("DashCount.png")
     d_board = load_image("DashCountBase.png")
     bgm = load_wav('normal_stage.wav')
-    bgm.set_volume(32)
+    bgm.set_volume(64)
     bgm.repeat_play()
     update()
 

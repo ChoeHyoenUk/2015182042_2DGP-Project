@@ -26,6 +26,9 @@ class Skeleton:
         self.state = "Idle"
         self.hit_player = False
         self.hit = False
+        self.hit_player_sound = load_wav('hit_player.wav')
+        self.hit_player_sound.set_volume(64)
+        self.font = load_font('ENCR10B.TTF', 16)
         self.build_behavior_tree()
 
     def set_background(self, back):
@@ -81,9 +84,9 @@ class Skeleton:
         # if atk_frame is 2~6 collision check with player later
         if 2 <= self.atk_frame <= 6:
             if self.attack_collide() and not self.hit_player:
+                self.hit_player_sound.play()
                 normal_stage.player.hp -= self.attack_power
                 self.hit_player = True
-                print(normal_stage.player.hp)
 
         if self.atk_frame >= 12:
             self.state = "Idle"
@@ -155,3 +158,4 @@ class Skeleton:
                 Skeleton.image.clip_draw(int(self.frame) * 33, 60, 33, 30, cx, cy, 33, 90)
             elif self.dir == 1:
                 Skeleton.image.clip_draw(int(self.frame) * 33, 90, 33, 30, cx, cy, 33, 90)
+        self.font.draw(cx - 35, cy + 60, 'HP : %d' % self.hp, (255, 0, 0))

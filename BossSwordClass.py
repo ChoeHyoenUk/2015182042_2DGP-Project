@@ -18,6 +18,8 @@ class Boss_Sword:
         self.end_x, self.end_y = boss_stage.player.x, boss_stage.player.y - 40
         self.hit_point_x, self.hit_point_y = self.x, self.y - 60
         self.fall_distant = 0
+        self.hit_player_sound = load_wav('hit_player.wav')
+        self.hit_player_sound.set_volume(64)
         self.hit_player = False
 
     def update(self):
@@ -34,6 +36,7 @@ class Boss_Sword:
             self.fall_distant += 1 * game_framework.frame_time
             if boss_stage.player.x - 15 <= self.hit_point_x <= boss_stage.player.x + 15 and boss_stage.player.y - 30 <= self.hit_point_y <= boss_stage.player.y:
                 if not self.hit_player and not boss_stage.player.opacity_mode:
+                    self.hit_player_sound.play()
                     boss_stage.player.hp -= Boss_Sword.Atk
                     self.hit_player = True
             if self.fall_distant >= 1:

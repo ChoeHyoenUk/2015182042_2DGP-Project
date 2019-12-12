@@ -28,7 +28,7 @@ def enter():
     grass = load_image('grass.png')
     dungeon_entrance = load_image('Enterance(117x85).png')
     bgm = load_wav('intro_stage.wav')
-    bgm.set_volume(32)
+    bgm.set_volume(64)
     bgm.repeat_play()
 
 

@@ -3,6 +3,8 @@ from FireSword import FireSword
 from Zweihander import Zweihander
 import game_framework
 import threading
+import normal_stage
+import boss_stage
 
 # Player Event
 A_DOWN, A_UP, D_DOWN, D_UP, SPACE_DOWN, RBUTTON_DOWN, LBUTTON_DOWN, MAX_DISTANCE, COLLIDE = range(9)
@@ -564,9 +566,23 @@ class Player:
 
         self.move_sound = load_wav('move.wav')
         self.jump_sound = load_wav('jump.wav')
-        self.move_sound.set_volume(32)
-        self.jump_sound.set_volume(32)
+        self.move_sound.set_volume(64)
+        self.jump_sound.set_volume(64)
         self.font = load_font('ENCR10B.TTF', 16)
+
+    def get_bb(self):
+        return self.x - 15, self.y - 30, self.x + 15, self.y
+
+    def collide(self, b):
+        left_a, bottom_a, right_a, top_a = self.get_bb()
+
+        left_b, bottom_b, right_b, top_b = b.get_bb()
+
+        if left_a > right_b: return False
+        if right_a < left_b: return False
+        if top_a < bottom_b: return False
+        if bottom_a > top_b: return False
+        return True
 
     def dash_timer(self):
         if self.dash_count < 6:
@@ -623,9 +639,9 @@ class Player:
                     end_x = event.x
 
                 # y축 거리 확인
-                if (600 - 1 - event.y) - (self.y) > 230:
+                if (600 - 1 - event.y) - self.y > 230:
                     end_y = self.y + 230
-                elif (600 - 1 - event.y) - (self.y) < -230:
+                elif (600 - 1 - event.y) - self.y < -230:
                     end_y = self.y - 230
                 elif (600 - 1 - event.y) < 85:
                     end_y = 85
