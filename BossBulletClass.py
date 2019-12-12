@@ -53,4 +53,3 @@ class Boss_Bullet:
 
     def draw(self):
         Boss_Bullet.image.draw(self.x, self.y, 25, 25)
-        draw_rectangle(self.x - 12.5, self.y - 12.5, self.x + 12.5, self.y + 12.5)

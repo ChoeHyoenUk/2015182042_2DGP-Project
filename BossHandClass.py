@@ -64,8 +64,6 @@ class Boss_Hand:
             if self.frame >= 2:
                 if self.which_hand == -1:
                     self.laser.clip_draw(0, int(self.frame) * 55, 320, 55, self.x + 195, self.y)
-                    draw_rectangle((self.x + 195) - 160, self.y - 27.5, (self.x + 195) + 160, self.y + 27.5)
                 else:
                     self.laser.clip_composite_draw(0, int(self.frame) * 55, 320, 55, 0, 'h', self.x - 195, self.y, 320,
                                                    55)
-                    draw_rectangle((self.x - 195) - 160, self.y - 27.5, (self.x - 195) + 160, self.y + 27.5)
